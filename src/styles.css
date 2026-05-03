@@ -408,7 +408,7 @@
 
   .movable-console-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     gap: 1rem;
   }
@@ -420,21 +420,26 @@
     gap: 0.35rem;
   }
 
-  .movable-panel-oscillators,
-  .movable-panel-presets {
-    grid-column: span 2;
+  .movable-panel-frame.is-dragging {
+    opacity: 0.52;
   }
 
-  .panel-move-controls {
+  .movable-panel-frame.is-drop-target {
+    border-radius: 8px;
+    outline: 2px solid rgba(77, 215, 109, 0.72);
+    outline-offset: 0.22rem;
+  }
+
+  .panel-drag-controls {
     display: flex;
     align-items: center;
-    justify-content: flex-end;
-    gap: 0.28rem;
+    justify-content: flex-start;
+    gap: 0.45rem;
     min-width: 0;
     padding: 0 0.25rem;
   }
 
-  .panel-move-controls span {
+  .panel-drag-controls > span {
     overflow: hidden;
     color: rgba(223, 250, 255, 0.72);
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -445,37 +450,49 @@
     white-space: nowrap;
   }
 
-  .panel-move-controls button {
+  .panel-drag-handle {
     display: grid;
-    width: 1.55rem;
-    height: 1.35rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    flex: 0 0 auto;
     place-items: center;
-    border: 1px solid rgba(94, 232, 255, 0.32);
-    border-radius: 4px;
+    border: 1px solid rgba(39, 105, 55, 0.62);
+    border-radius: 6px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(94, 232, 255, 0.08)),
-      rgba(18, 15, 24, 0.76);
-    color: #eefcff;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 0.66rem;
-    font-weight: 900;
-    line-height: 1;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 3px 9px rgba(18, 12, 20, 0.18);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.08)),
+      #73d982;
+    cursor: grab;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.48),
+      inset 0 -1px 0 rgba(12, 78, 30, 0.22),
+      0 4px 12px rgba(28, 100, 44, 0.22);
   }
 
-  .panel-move-controls button:hover:not(:disabled) {
-    border-color: rgba(94, 232, 255, 0.72);
-    color: #ffffff;
-    box-shadow: 0 0 12px rgba(94, 232, 255, 0.22);
+  .panel-drag-handle:hover {
+    border-color: rgba(35, 102, 50, 0.84);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.56),
+      0 0 14px rgba(115, 217, 130, 0.38);
   }
 
-  .panel-move-controls button:active:not(:disabled) {
+  .panel-drag-handle:active {
+    cursor: grabbing;
     transform: translateY(1px);
   }
 
-  .panel-move-controls button:disabled {
-    cursor: not-allowed;
-    opacity: 0.34;
+  .drag-grip-dots {
+    display: grid;
+    grid-template-columns: repeat(2, 0.22rem);
+    grid-template-rows: repeat(3, 0.22rem);
+    gap: 0.17rem;
+  }
+
+  .drag-grip-dots span {
+    width: 0.22rem;
+    height: 0.22rem;
+    border-radius: 999px;
+    background: rgba(25, 82, 38, 0.82);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.34);
   }
 
   .section-panel {
@@ -2690,7 +2707,7 @@
     }
 
     .movable-console-grid {
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .primary-module-grid {

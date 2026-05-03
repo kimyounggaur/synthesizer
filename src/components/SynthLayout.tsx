@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type DragEvent } from 'react';
 import { AudioEngine } from '../audio/AudioEngine';
 import type { MeterSnapshot } from '../types/synth';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
@@ -17,7 +17,6 @@ const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false, audioStat
 const PANEL_LAYOUT_KEY = 'wave-vector-hybrid-synth:panel-layout';
 
 type MovablePanelId = 'oscillators' | 'filter' | 'envelopes' | 'presets' | 'lfo' | 'vector' | 'waveSeq' | 'effects';
-type MoveDirection = 'first' | 'previous' | 'next' | 'last';
 
 const defaultPanelOrder: MovablePanelId[] = ['oscillators', 'filter', 'envelopes', 'presets', 'lfo', 'vector', 'waveSeq', 'effects'];
 
@@ -48,28 +47,21 @@ function readPanelOrder(): MovablePanelId[] {
   }
 }
 
-function movePanelOrder(order: MovablePanelId[], panelId: MovablePanelId, direction: MoveDirection): MovablePanelId[] {
-  const from = order.indexOf(panelId);
-  if (from < 0) {
+function reorderPanelOrder(order: MovablePanelId[], source: MovablePanelId, target: MovablePanelId, placeAfter: boolean): MovablePanelId[] {
+  if (source === target) {
     return order;
   }
 
-  const to =
-    direction === 'first'
-      ? 0
-      : direction === 'last'
-        ? order.length - 1
-        : direction === 'previous'
-          ? Math.max(0, from - 1)
-          : Math.min(order.length - 1, from + 1);
-
-  if (from === to) {
+  const sourceIndex = order.indexOf(source);
+  const targetIndex = order.indexOf(target);
+  if (sourceIndex < 0 || targetIndex < 0) {
     return order;
   }
 
   const next = [...order];
-  const [panel] = next.splice(from, 1);
-  next.splice(to, 0, panel);
+  const [panel] = next.splice(sourceIndex, 1);
+  const adjustedTargetIndex = next.indexOf(target);
+  next.splice(adjustedTargetIndex + (placeAfter ? 1 : 0), 0, panel);
   return next;
 }
 
@@ -79,6 +71,8 @@ export function SynthLayout() {
   const [engineError, setEngineError] = useState<string | null>(null);
   const [meter, setMeter] = useState<MeterSnapshot>(silentMeter);
   const [panelOrder, setPanelOrder] = useState<MovablePanelId[]>(readPanelOrder);
+  const [draggedPanel, setDraggedPanel] = useState<MovablePanelId | null>(null);
+  const [dropTargetPanel, setDropTargetPanel] = useState<MovablePanelId | null>(null);
   const setActiveNote = useSynthStore((state) => state.setActiveNote);
   const clearActiveNote = useSynthStore((state) => state.clearActiveNote);
   const clearActiveNotes = useSynthStore((state) => state.clearActiveNotes);
@@ -165,8 +159,59 @@ export function SynthLayout() {
     }, 650);
   }, [clearActiveNote, setActiveNote]);
 
-  const handleMovePanel = useCallback((panelId: MovablePanelId, direction: MoveDirection) => {
-    setPanelOrder((order) => movePanelOrder(order, panelId, direction));
+  const handlePanelDragStart = useCallback((event: DragEvent<HTMLButtonElement>, panelId: MovablePanelId) => {
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', panelId);
+    setDraggedPanel(panelId);
+  }, []);
+
+  const handlePanelDragEnd = useCallback(() => {
+    setDraggedPanel(null);
+    setDropTargetPanel(null);
+  }, []);
+
+  const handlePanelDragOver = useCallback(
+    (event: DragEvent<HTMLDivElement>, panelId: MovablePanelId) => {
+      if (!draggedPanel || draggedPanel === panelId) {
+        return;
+      }
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+      setDropTargetPanel(panelId);
+    },
+    [draggedPanel],
+  );
+
+  const handlePanelDrop = useCallback(
+    (event: DragEvent<HTMLDivElement>, panelId: MovablePanelId) => {
+      event.preventDefault();
+      const source = (event.dataTransfer.getData('text/plain') || draggedPanel) as MovablePanelId | null;
+      if (!source || !defaultPanelOrder.includes(source) || source === panelId) {
+        handlePanelDragEnd();
+        return;
+      }
+
+      const rect = event.currentTarget.getBoundingClientRect();
+      const horizontal = rect.width > rect.height;
+      const placeAfter = horizontal ? event.clientX > rect.left + rect.width / 2 : event.clientY > rect.top + rect.height / 2;
+      setPanelOrder((order) => reorderPanelOrder(order, source, panelId, placeAfter));
+      handlePanelDragEnd();
+    },
+    [draggedPanel, handlePanelDragEnd],
+  );
+
+  const handlePanelKeyMove = useCallback((panelId: MovablePanelId, direction: -1 | 1) => {
+    setPanelOrder((order) => {
+      const index = order.indexOf(panelId);
+      const target = index + direction;
+      if (index < 0 || target < 0 || target >= order.length) {
+        return order;
+      }
+      const next = [...order];
+      const [panel] = next.splice(index, 1);
+      next.splice(target, 0, panel);
+      return next;
+    });
   }, []);
 
   const renderPanel = (panelId: MovablePanelId) => {
@@ -204,22 +249,43 @@ export function SynthLayout() {
         ) : (
           <>
             <section className="movable-console-grid" aria-label="Movable synth panels">
-              {panelOrder.map((panelId, index) => (
-                <div key={panelId} className={`movable-panel-frame movable-panel-${panelId}`}>
-                  <div className="panel-move-controls" aria-label={`${panelLabels[panelId]} layout controls`}>
-                    <button type="button" disabled={index === 0} onClick={() => handleMovePanel(panelId, 'first')} aria-label={`${panelLabels[panelId]} move to first`}>
-                      |&lt;
-                    </button>
-                    <button type="button" disabled={index === 0} onClick={() => handleMovePanel(panelId, 'previous')} aria-label={`${panelLabels[panelId]} move previous`}>
-                      &lt;
+              {panelOrder.map((panelId) => (
+                <div
+                  key={panelId}
+                  className={`movable-panel-frame movable-panel-${panelId} ${draggedPanel === panelId ? 'is-dragging' : ''} ${dropTargetPanel === panelId ? 'is-drop-target' : ''}`}
+                  onDragOver={(event) => handlePanelDragOver(event, panelId)}
+                  onDragLeave={() => setDropTargetPanel((current) => (current === panelId ? null : current))}
+                  onDrop={(event) => handlePanelDrop(event, panelId)}
+                >
+                  <div className="panel-drag-controls" aria-label={`${panelLabels[panelId]} drag layout controls`}>
+                    <button
+                      type="button"
+                      className="panel-drag-handle"
+                      draggable
+                      onDragStart={(event) => handlePanelDragStart(event, panelId)}
+                      onDragEnd={handlePanelDragEnd}
+                      onKeyDown={(event) => {
+                        if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                          event.preventDefault();
+                          handlePanelKeyMove(panelId, -1);
+                        }
+                        if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                          event.preventDefault();
+                          handlePanelKeyMove(panelId, 1);
+                        }
+                      }}
+                      aria-label={`${panelLabels[panelId]} drag to move panel`}
+                    >
+                      <span className="drag-grip-dots" aria-hidden="true">
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                        <span />
+                      </span>
                     </button>
                     <span>{panelLabels[panelId]}</span>
-                    <button type="button" disabled={index === panelOrder.length - 1} onClick={() => handleMovePanel(panelId, 'next')} aria-label={`${panelLabels[panelId]} move next`}>
-                      &gt;
-                    </button>
-                    <button type="button" disabled={index === panelOrder.length - 1} onClick={() => handleMovePanel(panelId, 'last')} aria-label={`${panelLabels[panelId]} move to last`}>
-                      &gt;|
-                    </button>
                   </div>
                   {renderPanel(panelId)}
                 </div>

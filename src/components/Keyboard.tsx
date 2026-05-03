@@ -7,6 +7,7 @@ interface KeyboardProps {
 }
 
 const chromaticNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const visibleKeyCount = 37;
 const computerMap = new Map<string, number>([
   ['a', 0],
   ['w', 1],
@@ -42,7 +43,7 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
 
   const notes = useMemo(() => {
     const base = (keyboardOctave + 1) * 12;
-    return Array.from({ length: 25 }, (_, index) => base + index);
+    return Array.from({ length: visibleKeyCount }, (_, index) => base + index);
   }, [keyboardOctave]);
 
   useEffect(() => {
@@ -133,7 +134,7 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
               }`}
               style={{
                 filter: active ? `brightness(${1.1 + velocity * 0.45})` : undefined,
-                background: active ? `linear-gradient(180deg, rgba(81,245,198,${0.45 + velocity * 0.35}), ${black ? '#111827' : '#e2e8f0'})` : undefined,
+                background: active ? `linear-gradient(180deg, rgba(255,90,63,${0.4 + velocity * 0.34}), ${black ? '#1d1b19' : '#fff8e7'})` : undefined,
               }}
               onPointerDown={(event) => {
                 event.currentTarget.setPointerCapture(event.pointerId);

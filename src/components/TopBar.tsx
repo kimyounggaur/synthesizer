@@ -21,10 +21,10 @@ export function TopBar({ onPanic, meter }: TopBarProps) {
   return (
     <header className="command-panel">
       <div className="brand-plate">
-        <div className="brand-mark">WV</div>
+        <div className="brand-mark">WV-5</div>
         <div>
-          <div className="brand-name">Wave Vector Hybrid</div>
-          <div className="brand-subtitle">Performance Synthesizer</div>
+          <div className="brand-name">Wave Vector V</div>
+          <div className="brand-subtitle">Analog Modeling Synthesizer</div>
         </div>
       </div>
 
@@ -32,7 +32,7 @@ export function TopBar({ onPanic, meter }: TopBarProps) {
         eyebrow="Program"
         value={currentPreset ?? 'Manual Patch'}
         detail={meter.clipping ? 'Output clipping' : 'Ready'}
-        tone={meter.clipping ? 'red' : 'mint'}
+        tone="red"
         className="min-h-[78px]"
       />
 

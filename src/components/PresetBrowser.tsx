@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { factoryPresets } from '../presets/factoryPresets';
+import { factoryPresets, presetCategoryOrder } from '../presets/factoryPresets';
 import { usePresetStore } from '../store/presetStore';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
+import type { SynthPreset } from '../types/synth';
 import { createUserPreset, exportPresets, parsePresetImport } from '../utils/presetStorage';
 
 export function PresetBrowser() {
@@ -27,6 +28,23 @@ export function PresetBrowser() {
     }
     return all.filter((preset) => `${preset.name} ${preset.category}`.toLowerCase().includes(normalizedQuery));
   }, [query, userPresets]);
+
+  const groupedPresets = useMemo(() => {
+    const categoryGroups = presetCategoryOrder
+      .map((category) => ({
+        category,
+        presets: presets.filter((preset) => preset.category === category),
+      }))
+      .filter((group) => group.presets.length > 0);
+
+    const customCategories = Array.from(new Set(presets.map((preset) => preset.category))).filter((category) => !presetCategoryOrder.includes(category));
+    const customGroups = customCategories.map((category) => ({
+      category,
+      presets: presets.filter((preset) => preset.category === category),
+    }));
+
+    return [...categoryGroups, ...customGroups];
+  }, [presets]);
 
   const handleSave = () => {
     const name = window.prompt('Preset name');
@@ -62,23 +80,34 @@ export function PresetBrowser() {
 
       <input className="mini-input" value={query} placeholder="Search" onChange={(event) => setQuery(event.target.value)} />
 
-      <div className="grid max-h-64 gap-2 overflow-y-auto pr-1">
-        {presets.map((preset) => {
-          const userOwned = preset.author === 'User';
-          return (
-            <div key={preset.id} className="grid grid-cols-[1fr_auto] gap-2 rounded-md border border-slate-700/70 bg-black/20 p-2">
-              <button className="text-left" onClick={() => loadPreset(preset)}>
-                <div className="truncate text-sm font-semibold text-slate-100">{preset.name}</div>
-                <div className="font-mono text-[0.68rem] uppercase tracking-wider text-slate-500">{preset.category}</div>
-              </button>
-              {userOwned ? (
-                <button className="soft-button h-8 px-2 text-xs" onClick={() => deleteUserPreset(preset.id)}>
-                  Del
-                </button>
-              ) : null}
+      <div className="preset-list max-h-80 overflow-y-auto pr-1">
+        {groupedPresets.map((group) => (
+          <div key={group.category} className="preset-group">
+            <div className="preset-group-header">
+              <span>{group.category}</span>
+              <span>{group.presets.length}</span>
             </div>
-          );
-        })}
+            <div className="grid gap-2">
+              {group.presets.map((preset: SynthPreset) => {
+                const userOwned = preset.author === 'User';
+                return (
+                  <div key={preset.id} className="preset-row">
+                    <button className="min-w-0 text-left" onClick={() => loadPreset(preset)}>
+                      <div className="truncate text-sm font-semibold text-slate-100">{preset.name}</div>
+                      <div className="font-mono text-[0.68rem] uppercase text-slate-500">{preset.author}</div>
+                    </button>
+                    {userOwned ? (
+                      <button className="soft-button h-8 px-2 text-xs" onClick={() => deleteUserPreset(preset.id)}>
+                        Del
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+        {groupedPresets.length === 0 ? <div className="rounded-md border border-slate-700/70 bg-black/20 p-3 text-sm text-slate-400">No presets found.</div> : null}
       </div>
 
       <div className="grid gap-2 border-t border-slate-700/60 pt-3">

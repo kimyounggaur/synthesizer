@@ -8,7 +8,6 @@ import { OscillatorPanel } from './OscillatorPanel';
 import { FilterPanel } from './FilterPanel';
 import { EnvelopePanel } from './EnvelopePanel';
 import { PresetBrowser } from './PresetBrowser';
-import { OutputMeter } from './OutputMeter';
 
 const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false };
 
@@ -83,8 +82,7 @@ export function SynthLayout() {
                 <EnvelopePanel />
               </div>
               <aside className="side-rack-grid">
-                <PresetBrowser />
-                <OutputMeter meter={meter} />
+                <PresetBrowser meter={meter} />
               </aside>
             </section>
             <Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />

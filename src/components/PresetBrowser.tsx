@@ -2,14 +2,33 @@ import { useEffect, useMemo, useState } from 'react';
 import { factoryPresets, presetCategoryOrder } from '../presets/factoryPresets';
 import { usePresetStore } from '../store/presetStore';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
-import type { SynthPreset } from '../types/synth';
+import type { MeterSnapshot, SynthPreset } from '../types/synth';
 import { createUserPreset, exportPresets, parsePresetImport } from '../utils/presetStorage';
 
-export function PresetBrowser() {
+type PresetFilter = SynthPreset['category'] | 'All' | 'User';
+
+interface PresetBrowserProps {
+  meter: MeterSnapshot;
+}
+
+function MeterLine({ label, value, tone = 'normal' }: { label: string; value: number; tone?: 'normal' | 'hot' }) {
+  return (
+    <div className="flex-meter-line">
+      <span>{label}</span>
+      <div className="flex-meter-track">
+        <div className={tone === 'hot' ? 'flex-meter-fill is-hot' : 'flex-meter-fill'} style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  );
+}
+
+export function PresetBrowser({ meter }: PresetBrowserProps) {
   const [query, setQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState<PresetFilter>('All');
   const [importText, setImportText] = useState('');
   const loadPreset = useSynthStore((state) => state.loadPreset);
   const savePresetMarker = useSynthStore((state) => state.savePreset);
+  const currentPreset = useSynthStore((state) => state.currentPreset);
   const userPresets = usePresetStore((state) => state.userPresets);
   const loadUserPresets = usePresetStore((state) => state.loadUserPresets);
   const saveUserPreset = usePresetStore((state) => state.saveUserPreset);
@@ -20,31 +39,31 @@ export function PresetBrowser() {
     loadUserPresets();
   }, [loadUserPresets]);
 
+  const allPresets = useMemo(() => [...factoryPresets, ...userPresets], [userPresets]);
+
+  const categoryCounts = useMemo(
+    () =>
+      presetCategoryOrder.map((category) => ({
+        category,
+        count: allPresets.filter((preset) => preset.category === category).length,
+      })),
+    [allPresets],
+  );
+
   const presets = useMemo(() => {
-    const all = [...factoryPresets, ...userPresets];
+    const filteredByLibrary =
+      selectedFilter === 'All'
+        ? allPresets
+        : selectedFilter === 'User'
+          ? allPresets.filter((preset) => preset.author === 'User')
+          : allPresets.filter((preset) => preset.category === selectedFilter);
+
     const normalizedQuery = query.trim().toLowerCase();
     if (!normalizedQuery) {
-      return all;
+      return filteredByLibrary;
     }
-    return all.filter((preset) => `${preset.name} ${preset.category}`.toLowerCase().includes(normalizedQuery));
-  }, [query, userPresets]);
-
-  const groupedPresets = useMemo(() => {
-    const categoryGroups = presetCategoryOrder
-      .map((category) => ({
-        category,
-        presets: presets.filter((preset) => preset.category === category),
-      }))
-      .filter((group) => group.presets.length > 0);
-
-    const customCategories = Array.from(new Set(presets.map((preset) => preset.category))).filter((category) => !presetCategoryOrder.includes(category));
-    const customGroups = customCategories.map((category) => ({
-      category,
-      presets: presets.filter((preset) => preset.category === category),
-    }));
-
-    return [...categoryGroups, ...customGroups];
-  }, [presets]);
+    return filteredByLibrary.filter((preset) => `${preset.name} ${preset.category} ${preset.author}`.toLowerCase().includes(normalizedQuery));
+  }, [allPresets, query, selectedFilter]);
 
   const handleSave = () => {
     const name = window.prompt('Preset name');
@@ -69,62 +88,111 @@ export function PresetBrowser() {
     }
   };
 
+  const peak = Math.min(100, meter.peak * 100);
+  const rms = Math.min(100, meter.rms * 160);
+  const activeFilterLabel = selectedFilter === 'All' ? 'All Presets' : selectedFilter === 'User' ? 'User Presets' : selectedFilter;
+
   return (
-    <section className="panel grid gap-3 p-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="panel-title">Presets</h2>
-        <button className="soft-button h-9 px-3" onClick={handleSave}>
-          Save
-        </button>
-      </div>
-
-      <input className="mini-input" value={query} placeholder="Search" onChange={(event) => setQuery(event.target.value)} />
-
-      <div className="preset-list max-h-80 overflow-y-auto pr-1">
-        {groupedPresets.map((group) => (
-          <div key={group.category} className="preset-group">
-            <div className="preset-group-header">
-              <span>{group.category}</span>
-              <span>{group.presets.length}</span>
-            </div>
-            <div className="grid gap-2">
-              {group.presets.map((preset: SynthPreset) => {
-                const userOwned = preset.author === 'User';
-                return (
-                  <div key={preset.id} className="preset-row">
-                    <button className="min-w-0 text-left" onClick={() => loadPreset(preset)}>
-                      <div className="truncate text-sm font-semibold text-slate-100">{preset.name}</div>
-                      <div className="font-mono text-[0.68rem] uppercase text-slate-500">{preset.author}</div>
-                    </button>
-                    {userOwned ? (
-                      <button className="soft-button h-8 px-2 text-xs" onClick={() => deleteUserPreset(preset.id)}>
-                        Del
-                      </button>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        ))}
-        {groupedPresets.length === 0 ? <div className="rounded-md border border-slate-700/70 bg-black/20 p-3 text-sm text-slate-400">No presets found.</div> : null}
-      </div>
-
-      <div className="grid gap-2 border-t border-slate-700/60 pt-3">
-        <div className="grid grid-cols-2 gap-2">
-          <button className="soft-button h-9 px-3" onClick={handleExport}>
-            Export
-          </button>
-          <button className="soft-button h-9 px-3" onClick={handleImport}>
-            Import
-          </button>
+    <section className="panel flex-preset-panel">
+      <div className="flex-preset-header">
+        <div className="flex-preset-tabs" aria-label="Preset browser tabs">
+          <span className="is-active">Library</span>
+          <span>Store</span>
         </div>
-        <textarea
-          className="mini-input min-h-20 resize-y font-mono text-xs"
-          value={importText}
-          placeholder="JSON"
-          onChange={(event) => setImportText(event.target.value)}
-        />
+        <div className="flex-preset-heading">
+          <span>Presets</span>
+          <span>{presets.length}</span>
+        </div>
+      </div>
+
+      <div className="flex-preset-body">
+        <aside className="flex-preset-sidebar">
+          <div className="flex-library-list">
+            <button className={selectedFilter === 'All' ? 'flex-library-button is-active' : 'flex-library-button'} onClick={() => setSelectedFilter('All')}>
+              <span>All Presets</span>
+              <span>{allPresets.length}</span>
+            </button>
+            {categoryCounts.map(({ category, count }) => (
+              <button
+                key={category}
+                className={selectedFilter === category ? 'flex-library-button is-active' : 'flex-library-button'}
+                onClick={() => setSelectedFilter(category)}
+              >
+                <span>{category}</span>
+                <span>{count}</span>
+              </button>
+            ))}
+            <div className="flex-library-divider" />
+            <button className={selectedFilter === 'User' ? 'flex-library-button is-active' : 'flex-library-button'} onClick={() => setSelectedFilter('User')}>
+              <span>User Presets</span>
+              <span>{userPresets.length}</span>
+            </button>
+          </div>
+
+          <div className="flex-preset-tools">
+            <div className="flex-tool-title">Preset Tools</div>
+            <button className="soft-button h-9 px-3" onClick={handleSave}>
+              Save
+            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button className="soft-button h-9 px-3" onClick={handleExport}>
+                Export
+              </button>
+              <button className="soft-button h-9 px-3" onClick={handleImport}>
+                Import
+              </button>
+            </div>
+            <textarea
+              className="mini-input flex-import-textarea"
+              value={importText}
+              placeholder="Preset JSON"
+              onChange={(event) => setImportText(event.target.value)}
+            />
+          </div>
+
+          <div className="flex-output">
+            <div className="flex-output-header">
+              <span>Output</span>
+              <span className={meter.clipping ? 'is-clipping' : ''}>{meter.clipping ? 'CLIP' : 'OK'}</span>
+            </div>
+            <MeterLine label="Peak" value={peak} tone={meter.clipping ? 'hot' : 'normal'} />
+            <MeterLine label="RMS" value={rms} />
+          </div>
+        </aside>
+
+        <div className="flex-preset-main">
+          <div className="flex-search-row">
+            <div className="flex-search-meta">
+              <span>{activeFilterLabel}</span>
+              <span>{presets.length} sounds</span>
+            </div>
+            <input className="mini-input" value={query} placeholder="Search presets" onChange={(event) => setQuery(event.target.value)} />
+          </div>
+
+          <div className="flex-preset-list">
+            {presets.map((preset: SynthPreset) => {
+              const userOwned = preset.author === 'User';
+              const active = preset.id === currentPreset;
+              return (
+                <div key={preset.id} className={active ? 'flex-preset-row is-active' : 'flex-preset-row'}>
+                  <button className="flex-preset-load" onClick={() => loadPreset(preset)}>
+                    <span className="flex-preset-name">{preset.name}</span>
+                    <span className="flex-preset-meta">
+                      {preset.category} / {preset.author}
+                    </span>
+                  </button>
+                  {active ? <span className="flex-preset-loaded">Loaded</span> : null}
+                  {userOwned ? (
+                    <button className="flex-delete-button" onClick={() => deleteUserPreset(preset.id)}>
+                      Del
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })}
+            {presets.length === 0 ? <div className="flex-empty-state">No presets found.</div> : null}
+          </div>
+        </div>
       </div>
     </section>
   );

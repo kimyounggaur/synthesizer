@@ -67,8 +67,8 @@ export function SynthLayout() {
   }, [clearActiveNotes]);
 
   return (
-    <main className="synth-workbench min-h-screen px-3 py-4 text-slate-100 md:px-6 lg:px-8">
-      <div className="hardware-shell mx-auto flex max-w-[1520px] flex-col gap-4 p-3 md:p-4">
+    <main className="synth-workbench min-h-screen p-2 text-slate-100 md:p-3">
+      <div className="hardware-shell flex w-full max-w-none flex-col gap-4 p-3 md:p-4">
         <TopBar onPanic={handlePanic} meter={meter} />
 
         {engineError ? (

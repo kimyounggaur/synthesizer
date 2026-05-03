@@ -1410,6 +1410,17 @@
     grid-template-columns: minmax(0, 1fr) minmax(440px, 540px);
   }
 
+  .synth-workbench {
+    width: 100%;
+    min-height: 100svh;
+  }
+
+  .hardware-shell {
+    width: 100%;
+    max-width: none;
+    min-height: calc(100svh - 1rem);
+  }
+
   .side-rack-grid {
     grid-template-columns: 1fr;
   }
@@ -1716,6 +1727,16 @@
     font-size: 0.78rem;
     text-align: center;
     background: rgba(0, 0, 0, 0.16);
+  }
+
+  @media (min-width: 1600px) {
+    .main-console-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(520px, 620px);
+    }
+
+    .primary-module-grid {
+      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.9fr);
+    }
   }
 
   @media (max-width: 1180px) {

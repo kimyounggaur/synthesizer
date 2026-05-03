@@ -406,6 +406,78 @@
     align-content: start;
   }
 
+  .movable-console-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    gap: 1rem;
+  }
+
+  .movable-panel-frame {
+    display: grid;
+    min-width: 0;
+    align-content: start;
+    gap: 0.35rem;
+  }
+
+  .movable-panel-oscillators,
+  .movable-panel-presets {
+    grid-column: span 2;
+  }
+
+  .panel-move-controls {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.28rem;
+    min-width: 0;
+    padding: 0 0.25rem;
+  }
+
+  .panel-move-controls span {
+    overflow: hidden;
+    color: rgba(223, 250, 255, 0.72);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .panel-move-controls button {
+    display: grid;
+    width: 1.55rem;
+    height: 1.35rem;
+    place-items: center;
+    border: 1px solid rgba(94, 232, 255, 0.32);
+    border-radius: 4px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(94, 232, 255, 0.08)),
+      rgba(18, 15, 24, 0.76);
+    color: #eefcff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.66rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 3px 9px rgba(18, 12, 20, 0.18);
+  }
+
+  .panel-move-controls button:hover:not(:disabled) {
+    border-color: rgba(94, 232, 255, 0.72);
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(94, 232, 255, 0.22);
+  }
+
+  .panel-move-controls button:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .panel-move-controls button:disabled {
+    cursor: not-allowed;
+    opacity: 0.34;
+  }
+
   .section-panel {
     min-width: 0;
     overflow: hidden;
@@ -1951,17 +2023,9 @@
   }
 
   .flex-preset-load {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 0.55rem;
-    min-width: 0;
-    text-align: left;
-  }
-
-  .flex-preset-copy {
     display: block;
     min-width: 0;
+    text-align: left;
   }
 
   .flex-preset-name,
@@ -2625,6 +2689,10 @@
       grid-template-columns: minmax(0, 1fr) minmax(520px, 620px);
     }
 
+    .movable-console-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
     .primary-module-grid {
       grid-template-columns: minmax(440px, 1.35fr) minmax(320px, 0.85fr) minmax(320px, 0.85fr);
       grid-auto-flow: dense;
@@ -2635,8 +2703,13 @@
     .command-panel,
     .main-console-grid,
     .primary-module-grid,
-    .modulation-console-grid {
+    .modulation-console-grid,
+    .movable-console-grid {
       grid-template-columns: 1fr;
+    }
+
+    .movable-panel-frame {
+      grid-column: auto;
     }
 
     .primary-module-grid > .osc-panel {

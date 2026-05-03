@@ -2138,7 +2138,22 @@
   .modulation-console-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
     gap: 1rem;
+  }
+
+  .main-console-grid,
+  .primary-module-grid,
+  .side-rack-grid {
+    align-items: start;
+  }
+
+  .primary-module-grid > .osc-panel {
+    grid-row: auto;
+  }
+
+  .section-panel {
+    height: fit-content;
   }
 
   .lfo-panel-grid,
@@ -2315,7 +2330,8 @@
     }
 
     .primary-module-grid {
-      grid-template-columns: minmax(0, 1.45fr) minmax(360px, 0.9fr);
+      grid-template-columns: minmax(440px, 1.35fr) minmax(320px, 0.85fr) minmax(320px, 0.85fr);
+      grid-auto-flow: dense;
     }
   }
 

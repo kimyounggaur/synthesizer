@@ -126,4 +126,6 @@ export interface MeterSnapshot {
   peak: number;
   rms: number;
   clipping: boolean;
+  audioState: AudioContextState | 'unavailable';
+  activeVoices: number;
 }

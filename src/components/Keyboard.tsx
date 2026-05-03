@@ -7,7 +7,7 @@ interface KeyboardProps {
 }
 
 const chromaticNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-const visibleKeyCount = 37;
+const visibleKeyCount = 61;
 const computerMap = new Map<string, number>([
   ['a', 0],
   ['w', 1],
@@ -119,7 +119,7 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
         </div>
       </div>
 
-      <div className="flex min-h-44 overflow-x-auto rounded-md border border-slate-700 bg-black/40 p-2">
+      <div className="keyboard-bed">
         {notes.map((note) => {
           const black = isBlack(note);
           const active = activeNotes[note] !== undefined;
@@ -127,14 +127,13 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
           return (
             <button
               key={note}
-              className={`keyboard-key relative mr-1 flex shrink-0 items-end justify-center px-1 pb-3 font-mono text-[0.68rem] ${
+              className={`keyboard-key ${black ? 'is-black' : 'is-white'} ${active ? 'is-active' : ''} relative flex items-end justify-center px-1 pb-3 font-mono text-[0.68rem] ${
                 black
-                  ? 'h-28 w-8 bg-slate-950 text-slate-400 shadow-inner'
-                  : 'h-40 w-11 bg-slate-200 text-slate-950'
+                  ? 'bg-slate-950 text-slate-400 shadow-inner'
+                  : 'bg-slate-200 text-slate-950'
               }`}
               style={{
-                filter: active ? `brightness(${1.1 + velocity * 0.45})` : undefined,
-                background: active ? `linear-gradient(180deg, rgba(255,95,24,${0.42 + velocity * 0.34}), ${black ? '#ff5a15' : '#fffefe'})` : undefined,
+                ['--key-velocity' as string]: velocity,
               }}
               onPointerDown={(event) => {
                 event.currentTarget.setPointerCapture(event.pointerId);

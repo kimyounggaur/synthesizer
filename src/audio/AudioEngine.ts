@@ -30,7 +30,6 @@ export class AudioEngine {
     this.analyser = this.context.createAnalyser();
     this.state = initialState;
     this.maxPolyphony = initialState.polyphony;
-    this.analyserBuffer = new Float32Array(this.analyser.fftSize) as Float32Array<ArrayBuffer>;
 
     this.masterGain.gain.value = initialState.masterVolume;
     this.compressor.threshold.value = -10;
@@ -40,6 +39,7 @@ export class AudioEngine {
     this.compressor.release.value = 0.18;
     this.analyser.fftSize = 1024;
     this.analyser.smoothingTimeConstant = 0.72;
+    this.analyserBuffer = new Float32Array(this.analyser.fftSize) as Float32Array<ArrayBuffer>;
     this.effectsChain = new EffectsChain(this.context, initialState.effects);
     this.masterGain.connect(this.effectsChain.input);
     this.effectsChain.connect(this.compressor);
@@ -128,6 +128,8 @@ export class AudioEngine {
       peak: clamp(peak, 0, 1.5),
       rms: clamp(Math.sqrt(sum / this.analyserBuffer.length), 0, 1),
       clipping: peak >= 0.98,
+      audioState: this.context.state,
+      activeVoices: this.voices.size,
     };
   }
 

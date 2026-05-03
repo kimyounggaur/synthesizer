@@ -39,6 +39,7 @@ export class EffectsChain {
   disconnect(): void {
     this.input.disconnect();
     this.output.disconnect();
+    this.disconnectNodes();
   }
 
   private rebuild(): void {
@@ -71,7 +72,7 @@ export class EffectsChain {
   }
 
   private disconnectNodes(): void {
-    for (const node of [this.input, this.output, ...this.nodes]) {
+    for (const node of [this.input, ...this.nodes]) {
       try {
         node.disconnect();
       } catch {

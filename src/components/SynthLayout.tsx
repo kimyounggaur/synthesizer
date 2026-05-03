@@ -13,10 +13,11 @@ import { VectorMixerPanel } from './VectorMixerPanel';
 import { WaveSequencerPanel } from './WaveSequencerPanel';
 import { EffectsPanel } from './EffectsPanel';
 
-const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false };
+const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false, audioState: 'unavailable', activeVoices: 0 };
 
 export function SynthLayout() {
   const engineRef = useRef<AudioEngine | null>(null);
+  const testToneTimerRef = useRef<number | null>(null);
   const [engineError, setEngineError] = useState<string | null>(null);
   const [meter, setMeter] = useState<MeterSnapshot>(silentMeter);
   const setActiveNote = useSynthStore((state) => state.setActiveNote);
@@ -33,6 +34,10 @@ export function SynthLayout() {
 
       return () => {
         unsubscribe();
+        if (testToneTimerRef.current !== null) {
+          window.clearTimeout(testToneTimerRef.current);
+          testToneTimerRef.current = null;
+        }
         engine.close();
         engineRef.current = null;
       };
@@ -66,14 +71,37 @@ export function SynthLayout() {
   );
 
   const handlePanic = useCallback(() => {
+    if (testToneTimerRef.current !== null) {
+      window.clearTimeout(testToneTimerRef.current);
+      testToneTimerRef.current = null;
+    }
     engineRef.current?.panic();
     clearActiveNotes();
   }, [clearActiveNotes]);
 
+  const handleTestTone = useCallback(() => {
+    const note = 72;
+    const velocity = 0.82;
+
+    if (testToneTimerRef.current !== null) {
+      window.clearTimeout(testToneTimerRef.current);
+      clearActiveNote(note);
+    }
+
+    setActiveNote(note, velocity);
+    void engineRef.current?.noteOn(note, velocity);
+
+    testToneTimerRef.current = window.setTimeout(() => {
+      engineRef.current?.noteOff(note);
+      clearActiveNote(note);
+      testToneTimerRef.current = null;
+    }, 650);
+  }, [clearActiveNote, setActiveNote]);
+
   return (
     <main className="synth-workbench min-h-screen p-2 text-slate-100 md:p-3">
       <div className="hardware-shell flex w-full max-w-none flex-col gap-4 p-3 md:p-4">
-        <TopBar onPanic={handlePanic} meter={meter} />
+        <TopBar onPanic={handlePanic} onTestTone={handleTestTone} meter={meter} />
 
         {engineError ? (
           <div className="panel border-amber-400/40 p-4 text-sm text-amber-100">{engineError}</div>

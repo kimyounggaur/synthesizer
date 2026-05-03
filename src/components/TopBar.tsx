@@ -3,13 +3,15 @@ import { useSynthStore } from '../store/synthStore';
 import { Knob } from './ui/Knob';
 import { LedButton } from './ui/LedButton';
 import { MiniDisplay } from './ui/MiniDisplay';
+import { OutputMeter } from './OutputMeter';
 
 interface TopBarProps {
   onPanic: () => void;
+  onTestTone: () => void;
   meter: MeterSnapshot;
 }
 
-export function TopBar({ onPanic, meter }: TopBarProps) {
+export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
   const masterVolume = useSynthStore((state) => state.masterVolume);
   const bpm = useSynthStore((state) => state.bpm);
   const polyphony = useSynthStore((state) => state.polyphony);
@@ -35,6 +37,8 @@ export function TopBar({ onPanic, meter }: TopBarProps) {
         tone="red"
         className="min-h-[78px]"
       />
+
+      <OutputMeter meter={meter} compact onTestTone={onTestTone} />
 
       <div className="top-control-strip">
         <label className="compact-control">

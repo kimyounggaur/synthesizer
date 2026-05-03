@@ -409,7 +409,6 @@
   .movable-console-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-flow: row dense;
     align-items: start;
     gap: 1rem;
   }
@@ -421,7 +420,8 @@
     gap: 0.35rem;
   }
 
-  .movable-panel-frame {
+  .movable-panel-oscillators,
+  .movable-panel-presets {
     grid-column: span 2;
   }
 

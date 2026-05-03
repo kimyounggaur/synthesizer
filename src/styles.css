@@ -2060,6 +2060,81 @@
     background: linear-gradient(90deg, #fff0f8, #ff78c9);
   }
 
+  .flex-preset-panel {
+    min-height: 42rem;
+  }
+
+  .flex-preset-header {
+    min-height: 3.25rem;
+  }
+
+  .flex-preset-tabs,
+  .flex-preset-heading {
+    padding: 0 1rem;
+    font-size: clamp(1rem, 1.1vw, 1.3rem);
+    line-height: 1.05;
+  }
+
+  .flex-preset-tabs span {
+    min-height: 3.2rem;
+  }
+
+  .flex-library-button {
+    min-height: 2.35rem;
+    padding: 0.25rem 0.72rem;
+    font-size: clamp(0.92rem, 0.95vw, 1.12rem);
+    font-weight: 900;
+  }
+
+  .flex-library-button span:last-child {
+    font-size: clamp(0.78rem, 0.8vw, 0.95rem);
+  }
+
+  .flex-tool-title,
+  .flex-output-header {
+    font-size: clamp(0.78rem, 0.78vw, 0.95rem);
+  }
+
+  .flex-search-meta {
+    font-size: clamp(1rem, 1vw, 1.18rem);
+  }
+
+  .flex-search-meta span:last-child {
+    font-size: clamp(0.82rem, 0.8vw, 0.95rem);
+  }
+
+  .flex-search-row .mini-input {
+    min-height: 3rem;
+    font-size: clamp(1rem, 1vw, 1.2rem);
+    font-weight: 800;
+  }
+
+  .flex-preset-list {
+    max-height: 34rem;
+  }
+
+  .flex-preset-row {
+    min-height: 3.15rem;
+    gap: 0.5rem;
+    padding: 0.22rem 0.55rem 0.22rem 0.75rem;
+  }
+
+  .flex-preset-name {
+    font-size: clamp(1rem, 1vw, 1.22rem);
+    line-height: 1.08;
+  }
+
+  .flex-preset-meta {
+    margin-top: 0.18rem;
+    font-size: clamp(0.72rem, 0.72vw, 0.88rem);
+    line-height: 1.08;
+  }
+
+  .flex-preset-loaded,
+  .flex-delete-button {
+    font-size: clamp(0.68rem, 0.68vw, 0.82rem);
+  }
+
   .modulation-console-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

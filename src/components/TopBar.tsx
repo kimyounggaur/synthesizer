@@ -1,9 +1,12 @@
+import { useMemo } from 'react';
 import type { MeterSnapshot } from '../types/synth';
-import { useSynthStore } from '../store/synthStore';
+import { factoryPresets } from '../presets/factoryPresets';
+import { usePresetStore } from '../store/presetStore';
+import { selectEngineState, useSynthStore } from '../store/synthStore';
 import { Knob } from './ui/Knob';
 import { LedButton } from './ui/LedButton';
-import { MiniDisplay } from './ui/MiniDisplay';
 import { OutputMeter } from './OutputMeter';
+import { ProgramDisplay } from './ProgramDisplay';
 
 interface TopBarProps {
   onPanic: () => void;
@@ -16,9 +19,15 @@ export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
   const bpm = useSynthStore((state) => state.bpm);
   const polyphony = useSynthStore((state) => state.polyphony);
   const currentPreset = useSynthStore((state) => state.currentPreset);
+  const engineState = useSynthStore((state) => selectEngineState(state));
+  const userPresets = usePresetStore((state) => state.userPresets);
   const setMasterVolume = useSynthStore((state) => state.setMasterVolume);
   const setBpm = useSynthStore((state) => state.setBpm);
   const setPolyphony = useSynthStore((state) => state.setPolyphony);
+  const selectedPreset = useMemo(
+    () => [...factoryPresets, ...userPresets].find((preset) => preset.id === currentPreset),
+    [currentPreset, userPresets],
+  );
 
   return (
     <header className="command-panel">
@@ -30,13 +39,7 @@ export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
         </div>
       </div>
 
-      <MiniDisplay
-        eyebrow="Program"
-        value={currentPreset ?? 'Manual Patch'}
-        detail={meter.clipping ? 'Output clipping' : 'Ready'}
-        tone="red"
-        className="min-h-[78px]"
-      />
+      <ProgramDisplay engine={engineState} preset={selectedPreset} status={meter.clipping ? 'Output clipping' : 'Ready'} />
 
       <OutputMeter meter={meter} compact onTestTone={onTestTone} />
 

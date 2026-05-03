@@ -131,7 +131,7 @@
 
   .command-panel {
     display: grid;
-    grid-template-columns: minmax(210px, 0.72fr) minmax(260px, 1fr) minmax(240px, 0.86fr) minmax(380px, 1.34fr);
+    grid-template-columns: minmax(210px, 0.66fr) minmax(420px, 1.34fr) minmax(240px, 0.82fr) minmax(380px, 1.28fr);
     gap: 0.75rem;
     align-items: stretch;
     border: 1px solid rgba(188, 197, 206, 0.2);
@@ -856,6 +856,87 @@
     margin-top: 0.24rem;
     color: rgba(221, 235, 235, 0.58);
     font-size: 0.72rem;
+  }
+
+  .program-display {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(8.5rem, 42%);
+    min-width: 0;
+    overflow: hidden;
+    align-items: stretch;
+    gap: 0.75rem;
+    border: 1px solid rgba(94, 232, 255, 0.26);
+    border-radius: 7px;
+    background:
+      linear-gradient(180deg, rgba(94, 232, 255, 0.075), rgba(255, 255, 255, 0.012)),
+      #05080d;
+    padding: 0.55rem 0.6rem;
+    box-shadow: inset 0 0 22px rgba(94, 232, 255, 0.08), 0 0 18px rgba(94, 232, 255, 0.06);
+  }
+
+  .program-display-copy {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    min-width: 0;
+    align-content: center;
+  }
+
+  .program-display-eyebrow,
+  .program-display-detail,
+  .program-display-status {
+    color: rgba(223, 250, 255, 0.66);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .program-display-name {
+    overflow: hidden;
+    color: #f4fdff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: clamp(0.92rem, 1vw, 1.18rem);
+    font-weight: 900;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 14px rgba(94, 232, 255, 0.42);
+    white-space: nowrap;
+  }
+
+  .program-display-status {
+    align-self: end;
+    color: rgba(223, 250, 255, 0.82);
+    font-size: 0.58rem;
+    text-transform: none;
+  }
+
+  .preset-artwork {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(94, 232, 255, 0.18);
+    background: #030509;
+    box-shadow: inset 0 0 16px rgba(0, 0, 0, 0.42);
+  }
+
+  .preset-artwork svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  .preset-artwork-hero {
+    min-height: 5.1rem;
+    border-radius: 6px;
+  }
+
+  .preset-artwork-thumb {
+    width: 3.25rem;
+    height: 2rem;
+    flex: 0 0 auto;
+    border-radius: 4px;
   }
 
   .keyboard-bed {
@@ -1870,8 +1951,17 @@
   }
 
   .flex-preset-load {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.55rem;
     min-width: 0;
     text-align: left;
+  }
+
+  .flex-preset-copy {
+    display: block;
+    min-width: 0;
   }
 
   .flex-preset-name,

@@ -4,6 +4,7 @@ import { usePresetStore } from '../store/presetStore';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
 import type { MeterSnapshot, SynthPreset } from '../types/synth';
 import { createUserPreset, exportPresets, parsePresetImport } from '../utils/presetStorage';
+import { PresetArtwork } from './PresetArtwork';
 
 type PresetFilter = SynthPreset['category'] | 'All' | 'User';
 
@@ -182,9 +183,12 @@ export function PresetBrowser({ meter }: PresetBrowserProps) {
               return (
                 <div key={preset.id} className={active ? 'flex-preset-row is-active' : 'flex-preset-row'}>
                   <button className="flex-preset-load" onClick={() => loadPreset(preset)}>
-                    <span className="flex-preset-name">{preset.name}</span>
-                    <span className="flex-preset-meta">
-                      {preset.category} / {preset.author}
+                    <PresetArtwork preset={preset} engine={preset.engine} size="thumb" />
+                    <span className="flex-preset-copy">
+                      <span className="flex-preset-name">{preset.name}</span>
+                      <span className="flex-preset-meta">
+                        {preset.category} / {preset.author}
+                      </span>
                     </span>
                   </button>
                   {active ? <span className="flex-preset-loaded">Loaded</span> : null}

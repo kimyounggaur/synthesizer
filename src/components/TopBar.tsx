@@ -1,5 +1,8 @@
 import type { MeterSnapshot } from '../types/synth';
 import { useSynthStore } from '../store/synthStore';
+import { Knob } from './ui/Knob';
+import { LedButton } from './ui/LedButton';
+import { MiniDisplay } from './ui/MiniDisplay';
 
 interface TopBarProps {
   onPanic: () => void;
@@ -16,53 +19,66 @@ export function TopBar({ onPanic, meter }: TopBarProps) {
   const setPolyphony = useSynthStore((state) => state.setPolyphony);
 
   return (
-    <header className="panel grid gap-3 p-3 lg:grid-cols-[minmax(220px,1fr)_160px_180px_170px_96px] lg:items-center">
-      <div className="lcd min-h-14 px-4 py-3">
-        <div className="font-mono text-xs uppercase tracking-widest text-synth-mint/80">Wave Vector Hybrid</div>
-        <div className="truncate font-mono text-lg text-synth-mint">{currentPreset ?? 'Manual Patch'}</div>
+    <header className="command-panel">
+      <div className="brand-plate">
+        <div className="brand-mark">WV</div>
+        <div>
+          <div className="brand-name">Wave Vector Hybrid</div>
+          <div className="brand-subtitle">Performance Synthesizer</div>
+        </div>
       </div>
 
-      <label className="grid gap-1">
-        <span className="control-label">BPM</span>
-        <input
-          className="mini-input"
-          type="number"
-          min={40}
-          max={240}
-          value={bpm}
-          onChange={(event) => setBpm(Number(event.target.value))}
-        />
-      </label>
+      <MiniDisplay
+        eyebrow="Program"
+        value={currentPreset ?? 'Manual Patch'}
+        detail={meter.clipping ? 'Output clipping' : 'Ready'}
+        tone={meter.clipping ? 'red' : 'mint'}
+        className="min-h-[78px]"
+      />
 
-      <label className="grid gap-1">
-        <span className="control-label">Polyphony</span>
-        <input
-          className="mini-input"
-          type="number"
-          min={1}
-          max={16}
-          value={polyphony}
-          onChange={(event) => setPolyphony(Number(event.target.value))}
-        />
-      </label>
+      <div className="top-control-strip">
+        <label className="compact-control">
+          <span className="control-label">BPM</span>
+          <input
+            className="mini-input panel-input"
+            type="number"
+            min={40}
+            max={240}
+            value={bpm}
+            onChange={(event) => setBpm(Number(event.target.value))}
+          />
+        </label>
 
-      <label className="grid gap-1">
-        <span className="control-label">Master</span>
-        <input
-          className="range"
-          type="range"
+        <label className="compact-control">
+          <span className="control-label">Voices</span>
+          <input
+            className="mini-input panel-input"
+            type="number"
+            min={1}
+            max={16}
+            value={polyphony}
+            onChange={(event) => setPolyphony(Number(event.target.value))}
+          />
+        </label>
+
+        <Knob
+          label="Master"
           min={0}
           max={1}
           step={0.01}
           value={masterVolume}
-          onChange={(event) => setMasterVolume(Number(event.target.value))}
+          onChange={setMasterVolume}
+          displayValue={`${Math.round(masterVolume * 100)}%`}
+          tone="mint"
         />
-        <span className="font-mono text-xs text-slate-400">{Math.round(masterVolume * 100)}%</span>
-      </label>
 
-      <button className={`soft-button panic-button ${meter.clipping ? 'border-red-400 text-red-200' : ''}`} onClick={onPanic}>
-        Panic
-      </button>
+        <div className="panic-stack">
+          <LedButton active={meter.clipping} danger onClick={onPanic}>
+            Panic
+          </LedButton>
+          <div className={`clip-indicator ${meter.clipping ? 'is-hot' : ''}`}>{meter.clipping ? 'CLIP' : 'SIGNAL OK'}</div>
+        </div>
+      </div>
     </header>
   );
 }

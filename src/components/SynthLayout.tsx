@@ -68,21 +68,21 @@ export function SynthLayout() {
   }, [clearActiveNotes]);
 
   return (
-    <main className="min-h-screen px-3 py-4 text-slate-100 md:px-6 lg:px-8">
-      <div className="hardware-shell mx-auto flex max-w-[1480px] flex-col gap-4 rounded-lg p-3 md:p-4">
+    <main className="synth-workbench min-h-screen px-3 py-4 text-slate-100 md:px-6 lg:px-8">
+      <div className="hardware-shell mx-auto flex max-w-[1520px] flex-col gap-4 p-3 md:p-4">
         <TopBar onPanic={handlePanic} meter={meter} />
 
         {engineError ? (
           <div className="panel border-amber-400/40 p-4 text-sm text-amber-100">{engineError}</div>
         ) : (
           <>
-            <section className="grid gap-4 xl:grid-cols-[1fr_340px]">
-              <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+            <section className="main-console-grid">
+              <div className="primary-module-grid">
                 <OscillatorPanel />
                 <FilterPanel />
                 <EnvelopePanel />
               </div>
-              <aside className="grid gap-4 md:grid-cols-2 xl:grid-cols-1">
+              <aside className="side-rack-grid">
                 <PresetBrowser />
                 <OutputMeter meter={meter} />
               </aside>

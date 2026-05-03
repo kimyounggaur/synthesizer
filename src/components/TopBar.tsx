@@ -21,10 +21,10 @@ export function TopBar({ onPanic, meter }: TopBarProps) {
   return (
     <header className="command-panel">
       <div className="brand-plate">
-        <div className="brand-mark">WV-5</div>
+        <div className="brand-mark">M</div>
         <div>
-          <div className="brand-name">Wave Vector V</div>
-          <div className="brand-subtitle">Analog Modeling Synthesizer</div>
+          <div className="brand-name">M-WAVE SMK-37</div>
+          <div className="brand-subtitle">Elite Hybrid Synthesizer</div>
         </div>
       </div>
 

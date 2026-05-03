@@ -134,7 +134,7 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
               }`}
               style={{
                 filter: active ? `brightness(${1.1 + velocity * 0.45})` : undefined,
-                background: active ? `linear-gradient(180deg, rgba(255,90,63,${0.4 + velocity * 0.34}), ${black ? '#1d1b19' : '#fff8e7'})` : undefined,
+                background: active ? `linear-gradient(180deg, rgba(255,95,24,${0.42 + velocity * 0.34}), ${black ? '#ff5a15' : '#fffefe'})` : undefined,
               }}
               onPointerDown={(event) => {
                 event.currentTarget.setPointerCapture(event.pointerId);

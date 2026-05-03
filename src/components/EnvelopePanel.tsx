@@ -1,5 +1,22 @@
 import type { EnvelopeState } from '../types/synth';
 import { useSynthStore } from '../store/synthStore';
+import { Knob } from './ui/Knob';
+import { MiniDisplay } from './ui/MiniDisplay';
+import { SectionPanel } from './ui/SectionPanel';
+
+const controls: Array<keyof EnvelopeState> = ['attack', 'decay', 'sustain', 'release'];
+
+function formatEnvelopeValue(key: keyof EnvelopeState, value: number): string {
+  if (key === 'sustain') {
+    return `${Math.round(value * 100)}%`;
+  }
+
+  return value >= 1 ? `${value.toFixed(2)}s` : `${Math.round(value * 1000)}ms`;
+}
+
+function labelFor(key: keyof EnvelopeState): string {
+  return key === 'attack' ? 'Attack' : key === 'decay' ? 'Decay' : key === 'sustain' ? 'Sustain' : 'Release';
+}
 
 function EnvBlock({
   title,
@@ -10,26 +27,29 @@ function EnvBlock({
   env: EnvelopeState;
   onChange: (partial: Partial<EnvelopeState>) => void;
 }) {
-  const controls: Array<keyof EnvelopeState> = ['attack', 'decay', 'sustain', 'release'];
-
   return (
-    <div className="grid gap-3 rounded-md border border-slate-700/60 bg-black/15 p-3">
-      <div className="panel-title">{title}</div>
-      {controls.map((key) => (
-        <label key={key} className="grid gap-1">
-          <span className="control-label">{key}</span>
-          <input
-            className="range"
-            type="range"
+    <div className="module-block module-block-amber env-block">
+      <MiniDisplay
+        eyebrow={`${title} envelope`}
+        value="ADSR"
+        detail={`A ${formatEnvelopeValue('attack', env.attack)} / R ${formatEnvelopeValue('release', env.release)}`}
+        tone="amber"
+      />
+      <div className="knob-grid env-knob-grid">
+        {controls.map((key) => (
+          <Knob
+            key={key}
+            label={labelFor(key)}
             min={key === 'sustain' ? 0 : 0.001}
             max={key === 'sustain' ? 1 : 4}
             step={key === 'sustain' ? 0.01 : 0.001}
             value={env[key]}
-            onChange={(event) => onChange({ [key]: Number(event.target.value) })}
+            onChange={(value) => onChange({ [key]: value })}
+            displayValue={formatEnvelopeValue(key, env[key])}
+            tone={key === 'sustain' ? 'amber' : 'violet'}
           />
-          <span className="font-mono text-xs text-slate-400">{env[key].toFixed(3)}</span>
-        </label>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
@@ -40,16 +60,11 @@ export function EnvelopePanel() {
   const updateEnvelope = useSynthStore((state) => state.updateEnvelope);
 
   return (
-    <section className="panel grid gap-4 p-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="panel-title">Envelopes</h2>
-        <div className="h-2 w-16 rounded-full bg-gradient-to-r from-synth-violet to-synth-mint" />
-      </div>
-
-      <div className="grid gap-4 md:grid-cols-2 2xl:grid-cols-1">
+    <SectionPanel title="Envelopes" eyebrow="Contour generators" accent="red" className="envelope-panel">
+      <div className="envelope-grid">
         <EnvBlock title="Amp" env={ampEnv} onChange={(partial) => updateEnvelope('ampEnv', partial)} />
         <EnvBlock title="Filter" env={filterEnv} onChange={(partial) => updateEnvelope('filterEnv', partial)} />
       </div>
-    </section>
+    </SectionPanel>
   );
 }

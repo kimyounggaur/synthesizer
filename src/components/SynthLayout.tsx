@@ -8,6 +8,10 @@ import { OscillatorPanel } from './OscillatorPanel';
 import { FilterPanel } from './FilterPanel';
 import { EnvelopePanel } from './EnvelopePanel';
 import { PresetBrowser } from './PresetBrowser';
+import { LFOPanel } from './LFOPanel';
+import { VectorMixerPanel } from './VectorMixerPanel';
+import { WaveSequencerPanel } from './WaveSequencerPanel';
+import { EffectsPanel } from './EffectsPanel';
 
 const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false };
 
@@ -84,6 +88,12 @@ export function SynthLayout() {
               <aside className="side-rack-grid">
                 <PresetBrowser meter={meter} />
               </aside>
+            </section>
+            <section className="modulation-console-grid">
+              <LFOPanel />
+              <VectorMixerPanel />
+              <WaveSequencerPanel />
+              <EffectsPanel />
             </section>
             <Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />
           </>

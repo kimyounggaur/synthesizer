@@ -121,10 +121,12 @@ export interface SynthStore extends SynthEngineState {
   updateFilter: (partial: Partial<FilterState>) => void;
   updateEnvelope: (target: 'ampEnv' | 'filterEnv', partial: Partial<EnvelopeState>) => void;
   updateLFO: (target: 'lfo1' | 'lfo2', partial: Partial<LfoState>) => void;
+  updateWaveSequencer: (partial: Partial<WaveSequencerState>) => void;
   updateWaveStep: (index: number, partial: Partial<WaveStep>) => void;
   reorderWaveSteps: (from: number, to: number) => void;
   updateVectorPosition: (partial: Partial<VectorMixerState>) => void;
   addEffect: (effect: EffectState) => void;
+  updateEffect: (id: string, partial: Partial<EffectState>) => void;
   removeEffect: (id: string) => void;
   reorderEffects: (from: number, to: number) => void;
   loadPreset: (preset: SynthPreset) => void;
@@ -161,6 +163,7 @@ export const useSynthStore = create<SynthStore>((set) => ({
   updateFilter: (partial) => set((state) => ({ filter: { ...state.filter, ...partial } })),
   updateEnvelope: (target, partial) => set((state) => ({ [target]: { ...state[target], ...partial } })),
   updateLFO: (target, partial) => set((state) => ({ [target]: { ...state[target], ...partial } })),
+  updateWaveSequencer: (partial) => set((state) => ({ waveSequencer: { ...state.waveSequencer, ...partial } })),
   updateWaveStep: (index, partial) =>
     set((state) => ({
       waveSequencer: {
@@ -177,6 +180,10 @@ export const useSynthStore = create<SynthStore>((set) => ({
     })),
   updateVectorPosition: (partial) => set((state) => ({ vectorMixer: { ...state.vectorMixer, ...partial } })),
   addEffect: (effect) => set((state) => ({ effects: [...state.effects, effect] })),
+  updateEffect: (id, partial) =>
+    set((state) => ({
+      effects: state.effects.map((effect) => (effect.id === id ? { ...effect, ...partial, params: partial.params ?? effect.params } : effect)),
+    })),
   removeEffect: (id) => set((state) => ({ effects: state.effects.filter((effect) => effect.id !== id) })),
   reorderEffects: (from, to) => set((state) => ({ effects: reorder(state.effects, from, to) })),
   loadPreset: (preset) => set({ ...preset.engine, currentPreset: preset.id, activeNotes: {} }),

@@ -14,6 +14,11 @@ export class OscillatorModule {
   readonly output: GainNode;
   private readonly context: AudioContext;
   private readonly oscillator: OscillatorNode;
+  private note = 60;
+  private octave = 0;
+  private semitone = 0;
+  private fine = 0;
+  private pitchModCents = 0;
   private started = false;
 
   constructor(context: AudioContext, options: OscillatorModuleOptions) {
@@ -56,15 +61,29 @@ export class OscillatorModule {
     this.output.gain.setTargetAtTime(clamp(options.level, 0, 1), now, transitionTime);
   }
 
+  setPitchMod(cents: number): void {
+    this.pitchModCents = clamp(cents, -2400, 2400);
+    this.applyPitch();
+  }
+
   disconnect(): void {
     this.output.disconnect();
     this.oscillator.disconnect();
   }
 
   private updatePitch(note: number, octave: number, semitone: number, fine: number): void {
-    const base = midiNoteToFrequency(note) * semitoneRatio(octave * 12 + semitone);
-    this.oscillator.frequency.setValueAtTime(base, this.context.currentTime);
-    this.oscillator.detune.setValueAtTime(centsToDetune(fine), this.context.currentTime);
+    this.note = note;
+    this.octave = octave;
+    this.semitone = semitone;
+    this.fine = fine;
+    this.applyPitch();
+  }
+
+  private applyPitch(): void {
+    const now = this.context.currentTime;
+    const base = midiNoteToFrequency(this.note) * semitoneRatio(this.octave * 12 + this.semitone);
+    this.oscillator.frequency.setTargetAtTime(base, now, 0.01);
+    this.oscillator.detune.setTargetAtTime(centsToDetune(this.fine + this.pitchModCents), now, 0.01);
   }
 
   private applyWaveform(waveform: SynthWaveform): void {

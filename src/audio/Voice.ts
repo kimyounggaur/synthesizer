@@ -2,7 +2,7 @@ import { EnvelopeModule } from './EnvelopeModule';
 import { FilterModule } from './FilterModule';
 import { OscillatorModule } from './OscillatorModule';
 import { VectorMixer } from './VectorMixer';
-import type { NoiseKind, SynthEngineState } from '../types/synth';
+import type { LfoState, LfoTarget, NoiseKind, SynthEngineState, WaveStep } from '../types/synth';
 import { clamp, midiNoteToFrequency, normalizeVelocity } from '../utils/audioMath';
 
 type VoiceEndedCallback = (voice: Voice) => void;
@@ -21,7 +21,12 @@ export class Voice {
   private readonly vectorMixer: VectorMixer;
   private readonly filter: FilterModule;
   private readonly voiceGain: GainNode;
+  private readonly lfoAmpGain: GainNode;
+  private readonly panner: StereoPannerNode;
   private readonly ampEnvelope: EnvelopeModule;
+  private lfoTimer: number | null = null;
+  private waveSeqTimer: number | null = null;
+  private waveSeqIndex = 0;
   private releaseTimer: number | null = null;
   private released = false;
   private state: SynthEngineState;
@@ -54,9 +59,13 @@ export class Voice {
     this.vectorMixer = new VectorMixer(context);
     this.filter = new FilterModule(context);
     this.voiceGain = context.createGain();
+    this.lfoAmpGain = context.createGain();
+    this.panner = context.createStereoPanner();
     this.ampEnvelope = new EnvelopeModule(context, this.voiceGain.gain);
 
     this.voiceGain.gain.value = 0.0001;
+    this.lfoAmpGain.gain.value = 1;
+    this.panner.pan.value = 0;
     this.noiseGain.gain.value = state.noise.enabled ? state.noise.level : 0;
 
     this.oscA.connect(this.vectorMixer.inputA);
@@ -66,11 +75,13 @@ export class Voice {
     this.noiseGain.connect(this.vectorMixer.inputD);
     this.vectorMixer.connect(this.filter.input);
     this.filter.connect(this.voiceGain);
+    this.voiceGain.connect(this.lfoAmpGain);
+    this.lfoAmpGain.connect(this.panner);
     this.updateState(state);
   }
 
   connect(destination: AudioNode): void {
-    this.voiceGain.connect(destination);
+    this.panner.connect(destination);
   }
 
   start(when = this.context.currentTime): void {
@@ -109,6 +120,11 @@ export class Voice {
   stopImmediately(): void {
     if (this.releaseTimer !== null) {
       window.clearTimeout(this.releaseTimer);
+    }
+    this.stopWaveSequencer();
+    if (this.lfoTimer !== null) {
+      window.clearInterval(this.lfoTimer);
+      this.lfoTimer = null;
     }
 
     const now = this.context.currentTime;
@@ -152,6 +168,166 @@ export class Voice {
       d: state.noise.enabled ? state.noise.level : 0,
     });
     this.filter.setParams(state.filter, noteFrequency);
+    this.syncModulators();
+  }
+
+  private syncModulators(): void {
+    const hasLfo = this.state.lfo1.depth > 0.001 || this.state.lfo2.depth > 0.001;
+    if (hasLfo && this.lfoTimer === null) {
+      this.lfoTimer = window.setInterval(() => this.applyLfoFrame(), 32);
+    }
+    if (!hasLfo && this.lfoTimer !== null) {
+      window.clearInterval(this.lfoTimer);
+      this.lfoTimer = null;
+      this.resetLfoModulation();
+    }
+
+    if (this.state.waveSequencer.enabled && this.waveSeqTimer === null) {
+      this.scheduleWaveStep(0);
+    }
+    if (!this.state.waveSequencer.enabled && this.waveSeqTimer !== null) {
+      this.stopWaveSequencer();
+      this.oscA.update({ ...this.state.oscA, note: this.note });
+    }
+  }
+
+  private resetLfoModulation(): void {
+    const now = this.context.currentTime;
+    this.oscA.setPitchMod(0);
+    this.oscB.setPitchMod(0);
+    this.subOsc.setPitchMod(0);
+    this.lfoAmpGain.gain.setTargetAtTime(1, now, 0.03);
+    this.panner.pan.setTargetAtTime(0, now, 0.03);
+    this.vectorMixer.setPosition(this.state.vectorMixer.x, this.state.vectorMixer.y);
+  }
+
+  private applyLfoFrame(): void {
+    const sums: Record<LfoTarget, number> = {
+      pitch: 0,
+      filterCutoff: 0,
+      ampLevel: 0,
+      pan: 0,
+      oscMix: 0,
+      wavePosition: 0,
+    };
+
+    for (const lfo of [this.state.lfo1, this.state.lfo2]) {
+      if (lfo.depth <= 0.001) {
+        continue;
+      }
+      sums[lfo.target] += this.lfoValue(lfo) * lfo.depth;
+    }
+
+    const now = this.context.currentTime;
+    const pitchCents = clamp(sums.pitch, -1, 1) * 1200;
+    this.oscA.setPitchMod(pitchCents);
+    this.oscB.setPitchMod(pitchCents);
+    this.subOsc.setPitchMod(pitchCents);
+
+    if (Math.abs(sums.filterCutoff) > 0.001) {
+      const base = this.filter.getBaseCutoff();
+      const cutoff = clamp(base * 2 ** (sums.filterCutoff * 2), 24, 18000);
+      this.filter.frequency.setTargetAtTime(cutoff, now, 0.035);
+    }
+
+    this.lfoAmpGain.gain.setTargetAtTime(clamp(1 + sums.ampLevel * 0.85, 0.05, 1.75), now, 0.035);
+    this.panner.pan.setTargetAtTime(clamp(sums.pan, -1, 1), now, 0.035);
+    this.vectorMixer.setPosition(clamp(this.state.vectorMixer.x + sums.oscMix * 0.5, 0, 1), clamp(this.state.vectorMixer.y + sums.wavePosition * 0.5, 0, 1));
+  }
+
+  private lfoValue(lfo: LfoState): number {
+    const phase = (this.context.currentTime * this.lfoRate(lfo)) % 1;
+    if (lfo.waveform === 'square') {
+      return phase < 0.5 ? 1 : -1;
+    }
+    if (lfo.waveform === 'pulse') {
+      return phase < 0.28 ? 1 : -1;
+    }
+    if (lfo.waveform === 'sawtooth') {
+      return phase * 2 - 1;
+    }
+    if (lfo.waveform === 'triangle') {
+      return 1 - 4 * Math.abs(phase - 0.5);
+    }
+    if (lfo.waveform === 'wavetable') {
+      return Math.sin(phase * Math.PI * 2) * 0.7 + Math.sin(phase * Math.PI * 6) * 0.3;
+    }
+    return Math.sin(phase * Math.PI * 2);
+  }
+
+  private lfoRate(lfo: LfoState): number {
+    if (lfo.sync === 'free') {
+      return clamp(lfo.rate, 0.01, 30);
+    }
+
+    const beats = {
+      '1/1': 4,
+      '1/2': 2,
+      '1/4': 1,
+      '1/8': 0.5,
+      '1/16': 0.25,
+      '1/32': 0.125,
+    }[lfo.syncValue];
+    return 1 / Math.max(0.03, beats * (60 / this.state.bpm));
+  }
+
+  private scheduleWaveStep(delayMs: number): void {
+    this.waveSeqTimer = window.setTimeout(() => {
+      this.applyWaveStep();
+      this.scheduleWaveStep(this.currentWaveStepDuration());
+    }, delayMs);
+  }
+
+  private applyWaveStep(): void {
+    const steps = this.state.waveSequencer.steps;
+    if (steps.length === 0 || !this.state.waveSequencer.enabled) {
+      return;
+    }
+
+    const step = this.nextPlayableStep(steps);
+    if (!step) {
+      return;
+    }
+
+    this.oscA.update({
+      ...this.state.oscA,
+      waveform: step.reverse ? 'triangle' : step.waveform,
+      semitone: this.state.oscA.semitone + step.pitchOffset,
+      level: this.state.oscA.level * step.level,
+      note: this.note,
+    });
+  }
+
+  private nextPlayableStep(steps: WaveStep[]): WaveStep | null {
+    for (let offset = 0; offset < steps.length; offset += 1) {
+      const index = (this.waveSeqIndex + offset) % steps.length;
+      const step = steps[index];
+      if (!step.skip) {
+        this.waveSeqIndex = (index + 1) % steps.length;
+        return step;
+      }
+    }
+    return null;
+  }
+
+  private currentWaveStepDuration(): number {
+    const steps = this.state.waveSequencer.steps;
+    const current = steps[(this.waveSeqIndex + steps.length - 1) % steps.length];
+    if (!current) {
+      return 180;
+    }
+    if (!this.state.waveSequencer.tempoSync) {
+      return clamp(current.duration, 40, 1200);
+    }
+    return clamp((60 / this.state.bpm) * 1000 * (current.duration / 240), 40, 1200);
+  }
+
+  private stopWaveSequencer(): void {
+    if (this.waveSeqTimer !== null) {
+      window.clearTimeout(this.waveSeqTimer);
+      this.waveSeqTimer = null;
+    }
+    this.waveSeqIndex = 0;
   }
 
   private triggerFilterEnvelope(when: number): void {
@@ -211,6 +387,11 @@ export class Voice {
   }
 
   private dispose(): void {
+    this.stopWaveSequencer();
+    if (this.lfoTimer !== null) {
+      window.clearInterval(this.lfoTimer);
+      this.lfoTimer = null;
+    }
     this.oscA.disconnect();
     this.oscB.disconnect();
     this.subOsc.disconnect();
@@ -218,5 +399,7 @@ export class Voice {
     this.vectorMixer.disconnect();
     this.filter.disconnect();
     this.voiceGain.disconnect();
+    this.lfoAmpGain.disconnect();
+    this.panner.disconnect();
   }
 }

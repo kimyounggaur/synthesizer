@@ -76,7 +76,13 @@ export function PresetBrowser({ meter }: PresetBrowserProps) {
   };
 
   const handleExport = async () => {
-    await navigator.clipboard.writeText(exportPresets(userPresets));
+    const exported = exportPresets(userPresets);
+    setImportText(exported);
+    try {
+      await navigator.clipboard.writeText(exported);
+    } catch {
+      window.alert('Clipboard permission was blocked. Export JSON has been placed in the preset text box.');
+    }
   };
 
   const handleImport = () => {

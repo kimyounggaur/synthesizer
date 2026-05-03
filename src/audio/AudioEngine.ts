@@ -1,7 +1,7 @@
 import { Voice } from './Voice';
 import type { MeterSnapshot, SynthEngineState } from '../types/synth';
 import { clamp } from '../utils/audioMath';
-import type { EffectsChain } from './EffectsChain';
+import { EffectsChain } from './EffectsChain';
 
 type WindowWithWebkitAudio = Window & typeof globalThis & {
   webkitAudioContext?: typeof AudioContext;
@@ -40,7 +40,9 @@ export class AudioEngine {
     this.compressor.release.value = 0.18;
     this.analyser.fftSize = 1024;
     this.analyser.smoothingTimeConstant = 0.72;
-    this.masterGain.connect(this.compressor);
+    this.effectsChain = new EffectsChain(this.context, initialState.effects);
+    this.masterGain.connect(this.effectsChain.input);
+    this.effectsChain.connect(this.compressor);
     this.compressor.connect(this.analyser);
     this.analyser.connect(this.context.destination);
   }
@@ -55,6 +57,7 @@ export class AudioEngine {
     this.state = state;
     this.maxPolyphony = state.polyphony;
     this.setMasterVolume(state.masterVolume);
+    this.effectsChain?.update(state.effects);
     this.voices.forEach((voice) => voice.updateState(state));
   }
 

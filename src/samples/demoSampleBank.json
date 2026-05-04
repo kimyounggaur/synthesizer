@@ -1,0 +1,103 @@
+{
+  "id": "demo-generated-bank",
+  "name": "Generated Demo Bank",
+  "author": "Project demo",
+  "description": "Small generated test-tone presets for validating the sample preset layer without bundled third-party samples.",
+  "license": "Generated test tones for this project; no external sample source.",
+  "presets": [
+    {
+      "id": "generated-soft-piano",
+      "name": "Generated Soft Piano",
+      "category": "Piano",
+      "author": "Project demo",
+      "description": "A generated harmonic decay mapped like a single-zone sample preset.",
+      "license": "Generated test tone",
+      "sampleRate": 44100,
+      "zones": [
+        {
+          "id": "soft-piano-c4",
+          "url": "generated://soft-piano-c4",
+          "rootNote": 60,
+          "lowNote": 21,
+          "highNote": 108,
+          "lowVelocity": 0,
+          "highVelocity": 1,
+          "loop": false,
+          "gain": 0.95,
+          "pan": 0
+        }
+      ]
+    },
+    {
+      "id": "generated-ep-bell",
+      "name": "Generated EP Bell",
+      "category": "E-Piano",
+      "author": "Project demo",
+      "description": "A generated tine-like bell preset for sample playback tests.",
+      "license": "Generated test tone",
+      "sampleRate": 44100,
+      "zones": [
+        {
+          "id": "ep-bell-c5",
+          "url": "generated://ep-bell-c5",
+          "rootNote": 72,
+          "lowNote": 36,
+          "highNote": 108,
+          "lowVelocity": 0,
+          "highVelocity": 1,
+          "loop": false,
+          "gain": 0.82,
+          "pan": 0
+        }
+      ]
+    },
+    {
+      "id": "generated-organ-loop",
+      "name": "Generated Organ Loop",
+      "category": "Organ",
+      "author": "Project demo",
+      "description": "A generated looping organ waveform to validate sustained sample voices.",
+      "license": "Generated test tone",
+      "sampleRate": 44100,
+      "zones": [
+        {
+          "id": "organ-c4-loop",
+          "url": "generated://organ-c4",
+          "rootNote": 60,
+          "lowNote": 24,
+          "highNote": 96,
+          "lowVelocity": 0,
+          "highVelocity": 1,
+          "loop": true,
+          "loopStart": 0.12,
+          "loopEnd": 1.55,
+          "gain": 0.7,
+          "pan": 0
+        }
+      ]
+    },
+    {
+      "id": "generated-drum-hit",
+      "name": "Generated Drum Hit",
+      "category": "Drum",
+      "author": "Project demo",
+      "description": "A generated percussive hit for one-shot sample playback tests.",
+      "license": "Generated test tone",
+      "sampleRate": 44100,
+      "zones": [
+        {
+          "id": "drum-hit-c3",
+          "url": "generated://drum-hit-c3",
+          "rootNote": 48,
+          "lowNote": 24,
+          "highNote": 84,
+          "lowVelocity": 0,
+          "highVelocity": 1,
+          "loop": false,
+          "gain": 0.88,
+          "pan": 0
+        }
+      ]
+    }
+  ]
+}

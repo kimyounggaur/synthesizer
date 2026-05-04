@@ -8,6 +8,7 @@ import { OscillatorPanel } from './OscillatorPanel';
 import { FilterPanel } from './FilterPanel';
 import { EnvelopePanel } from './EnvelopePanel';
 import { PresetBrowser } from './PresetBrowser';
+import { SamplePresetBrowser } from './SamplePresetBrowser';
 import { LFOPanel } from './LFOPanel';
 import { VectorMixerPanel } from './VectorMixerPanel';
 import { WaveSequencerPanel } from './WaveSequencerPanel';
@@ -16,15 +17,16 @@ import { EffectsPanel } from './EffectsPanel';
 const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false, audioState: 'unavailable', activeVoices: 0 };
 const PANEL_LAYOUT_KEY = 'wave-vector-hybrid-synth:panel-layout';
 
-type MovablePanelId = 'oscillators' | 'filter' | 'envelopes' | 'presets' | 'lfo' | 'vector' | 'waveSeq' | 'effects';
+type MovablePanelId = 'oscillators' | 'filter' | 'envelopes' | 'presets' | 'samples' | 'lfo' | 'vector' | 'waveSeq' | 'effects';
 
-const defaultPanelOrder: MovablePanelId[] = ['oscillators', 'filter', 'envelopes', 'presets', 'lfo', 'vector', 'waveSeq', 'effects'];
+const defaultPanelOrder: MovablePanelId[] = ['oscillators', 'filter', 'envelopes', 'presets', 'samples', 'lfo', 'vector', 'waveSeq', 'effects'];
 
 const panelLabels: Record<MovablePanelId, string> = {
   oscillators: 'Oscillators',
   filter: 'Filter',
   envelopes: 'Envelopes',
   presets: 'Presets',
+  samples: 'Samples',
   lfo: 'LFO',
   vector: 'Vector',
   waveSeq: 'Wave Seq',
@@ -226,6 +228,9 @@ export function SynthLayout() {
     }
     if (panelId === 'presets') {
       return <PresetBrowser meter={meter} />;
+    }
+    if (panelId === 'samples') {
+      return <SamplePresetBrowser />;
     }
     if (panelId === 'lfo') {
       return <LFOPanel />;

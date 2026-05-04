@@ -7,6 +7,7 @@ import type {
   LfoState,
   NoiseState,
   OscillatorState,
+  SampleLayerState,
   SubOscillatorState,
   SynthEngineState,
   SynthPreset,
@@ -18,7 +19,18 @@ type PresetCategory = SynthPreset['category'];
 
 type EngineOverrides = Omit<
   Partial<SynthEngineState>,
-  'oscA' | 'oscB' | 'subOsc' | 'noise' | 'filter' | 'ampEnv' | 'filterEnv' | 'lfo1' | 'lfo2' | 'waveSequencer' | 'vectorMixer'
+  | 'oscA'
+  | 'oscB'
+  | 'subOsc'
+  | 'noise'
+  | 'filter'
+  | 'ampEnv'
+  | 'filterEnv'
+  | 'lfo1'
+  | 'lfo2'
+  | 'waveSequencer'
+  | 'vectorMixer'
+  | 'sampleLayer'
 > & {
   oscA?: Partial<OscillatorState>;
   oscB?: Partial<OscillatorState>;
@@ -31,6 +43,7 @@ type EngineOverrides = Omit<
   lfo2?: Partial<LfoState>;
   waveSequencer?: Partial<WaveSequencerState>;
   vectorMixer?: Partial<VectorMixerState>;
+  sampleLayer?: Partial<SampleLayerState>;
 };
 
 const createdAt = '2026-05-03T00:00:00.000Z';
@@ -40,7 +53,18 @@ export const presetCategoryOrder: PresetCategory[] = [
   'Lead',
   'Pad',
   'Pluck',
+  'Keys',
+  'Piano',
+  'E-Piano',
+  'Organ',
+  'Strings',
+  'Choir',
+  'Brass',
+  'Woodwind',
+  'Guitar',
   'Bell',
+  'Mallet',
+  'Drum',
   'Sequence',
   'Ambient',
   'FX',
@@ -63,6 +87,7 @@ function engine(overrides: EngineOverrides): SynthEngineState {
     lfo2: { ...defaults.lfo2, ...overrides.lfo2 },
     waveSequencer: { ...defaults.waveSequencer, ...overrides.waveSequencer },
     vectorMixer: { ...defaults.vectorMixer, ...overrides.vectorMixer },
+    sampleLayer: { ...defaults.sampleLayer, ...overrides.sampleLayer },
     effects: overrides.effects ?? defaults.effects,
   };
 }

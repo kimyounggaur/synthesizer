@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { MeterSnapshot } from '../types/synth';
 import { factoryPresets } from '../presets/factoryPresets';
+import { sampleBankManager } from '../samples/sampleBankLibrary';
 import { usePresetStore } from '../store/presetStore';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
 import { Knob } from './ui/Knob';
@@ -28,6 +29,10 @@ export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
     () => [...factoryPresets, ...userPresets].find((preset) => preset.id === currentPreset),
     [currentPreset, userPresets],
   );
+  const selectedSamplePreset = useMemo(
+    () => sampleBankManager.getPreset(engineState.sampleLayer.bankId, engineState.sampleLayer.presetId) ?? undefined,
+    [engineState.sampleLayer.bankId, engineState.sampleLayer.presetId],
+  );
 
   return (
     <header className="command-panel">
@@ -39,7 +44,7 @@ export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
         </div>
       </div>
 
-      <ProgramDisplay engine={engineState} preset={selectedPreset} status={meter.clipping ? 'Output clipping' : 'Ready'} />
+      <ProgramDisplay engine={engineState} preset={selectedPreset} samplePreset={selectedSamplePreset} status={meter.clipping ? 'Output clipping' : 'Ready'} />
 
       <OutputMeter meter={meter} compact onTestTone={onTestTone} />
 

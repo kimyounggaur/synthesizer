@@ -4,7 +4,7 @@ type ArtworkSize = 'hero' | 'thumb';
 type ArtworkCategory = SynthPreset['category'];
 
 interface PresetArtworkProps {
-  preset?: SynthPreset;
+  preset?: { id: string; category: ArtworkCategory };
   engine: SynthEngineState;
   size?: ArtworkSize;
 }
@@ -19,6 +19,17 @@ const palettes: Record<ArtworkCategory, { base: string; deep: string; accent: st
   Ambient: { base: '#17162d', deep: '#05050f', accent: '#ffb9e8', secondary: '#8eeaff', glow: '#ffb9e8' },
   FX: { base: '#1c0d13', deep: '#060205', accent: '#ff4f65', secondary: '#ffe36f', glow: '#ff4f65' },
   Experimental: { base: '#101014', deep: '#030306', accent: '#f4ff6f', secondary: '#a178ff', glow: '#f4ff6f' },
+  Keys: { base: '#101725', deep: '#03070e', accent: '#f8f6ff', secondary: '#78e4ff', glow: '#78e4ff' },
+  Piano: { base: '#111722', deep: '#03060b', accent: '#ffffff', secondary: '#8bd7ff', glow: '#8bd7ff' },
+  'E-Piano': { base: '#17121f', deep: '#05030a', accent: '#9ff5ff', secondary: '#ffca7a', glow: '#9ff5ff' },
+  Organ: { base: '#101c15', deep: '#030704', accent: '#7dffb6', secondary: '#f2d16b', glow: '#7dffb6' },
+  Strings: { base: '#1d1320', deep: '#060308', accent: '#ffd1e7', secondary: '#b88cff', glow: '#ffd1e7' },
+  Choir: { base: '#17182a', deep: '#04050d', accent: '#d8e3ff', secondary: '#ffb7e6', glow: '#d8e3ff' },
+  Brass: { base: '#1f1508', deep: '#060301', accent: '#ffd36d', secondary: '#ff7e45', glow: '#ffd36d' },
+  Woodwind: { base: '#111b17', deep: '#030705', accent: '#b8ffd5', secondary: '#8ec8ff', glow: '#b8ffd5' },
+  Guitar: { base: '#1b120c', deep: '#060302', accent: '#ffc07a', secondary: '#80f0cf', glow: '#ffc07a' },
+  Mallet: { base: '#121821', deep: '#03060a', accent: '#e2f5ff', secondary: '#ffbf69', glow: '#e2f5ff' },
+  Drum: { base: '#1c1010', deep: '#060202', accent: '#ff7a5d', secondary: '#fff06b', glow: '#ff7a5d' },
 };
 
 function clamp(value: number, min = 0, max = 1): number {
@@ -35,6 +46,12 @@ function hashString(value: string): number {
 }
 
 function inferCategory(engine: SynthEngineState): ArtworkCategory {
+  if (engine.engineMode === 'sample') {
+    return 'Piano';
+  }
+  if (engine.engineMode === 'hybrid' && engine.sampleLayer.enabled) {
+    return 'Keys';
+  }
   if (engine.waveSequencer.enabled) {
     return 'Sequence';
   }

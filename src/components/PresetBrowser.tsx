@@ -43,10 +43,12 @@ export function PresetBrowser({ meter }: PresetBrowserProps) {
 
   const categoryCounts = useMemo(
     () =>
-      presetCategoryOrder.map((category) => ({
-        category,
-        count: allPresets.filter((preset) => preset.category === category).length,
-      })),
+      presetCategoryOrder
+        .map((category) => ({
+          category,
+          count: allPresets.filter((preset) => preset.category === category).length,
+        }))
+        .filter(({ count }) => count > 0),
     [allPresets],
   );
 

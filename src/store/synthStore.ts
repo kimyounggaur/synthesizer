@@ -1,11 +1,13 @@
 import { create } from 'zustand';
 import type {
+  EngineMode,
   EffectState,
   EnvelopeState,
   FilterState,
   LfoState,
   NoiseState,
   OscillatorState,
+  SampleLayerState,
   SubOscillatorState,
   SynthEngineState,
   SynthPreset,
@@ -29,8 +31,27 @@ function createDefaultWaveSteps(): WaveStep[] {
   }));
 }
 
+export function createDefaultSampleLayerState(): SampleLayerState {
+  return {
+    enabled: false,
+    bankId: null,
+    presetId: null,
+    level: 0.85,
+    attack: 0.003,
+    decay: 0.2,
+    sustain: 1,
+    release: 0.6,
+    filterEnabled: false,
+    filterCutoff: 12000,
+    filterResonance: 0.8,
+    oneShot: false,
+    preload: true,
+  };
+}
+
 export function createDefaultEngineState(): SynthEngineState {
   return {
+    engineMode: 'synth',
     masterVolume: 0.72,
     bpm: 118,
     polyphony: 8,
@@ -105,8 +126,34 @@ export function createDefaultEngineState(): SynthEngineState {
       x: 0.48,
       y: 0.08,
     },
+    sampleLayer: createDefaultSampleLayerState(),
     effects: [],
     currentPreset: null,
+  };
+}
+
+export function normalizeEngineState(engine: Partial<SynthEngineState>): SynthEngineState {
+  const defaults = createDefaultEngineState();
+  return {
+    ...defaults,
+    ...engine,
+    oscA: { ...defaults.oscA, ...engine.oscA },
+    oscB: { ...defaults.oscB, ...engine.oscB },
+    subOsc: { ...defaults.subOsc, ...engine.subOsc },
+    noise: { ...defaults.noise, ...engine.noise },
+    filter: { ...defaults.filter, ...engine.filter },
+    ampEnv: { ...defaults.ampEnv, ...engine.ampEnv },
+    filterEnv: { ...defaults.filterEnv, ...engine.filterEnv },
+    lfo1: { ...defaults.lfo1, ...engine.lfo1 },
+    lfo2: { ...defaults.lfo2, ...engine.lfo2 },
+    waveSequencer: {
+      ...defaults.waveSequencer,
+      ...engine.waveSequencer,
+      steps: engine.waveSequencer?.steps ?? defaults.waveSequencer.steps,
+    },
+    vectorMixer: { ...defaults.vectorMixer, ...engine.vectorMixer },
+    sampleLayer: { ...defaults.sampleLayer, ...engine.sampleLayer },
+    effects: engine.effects ?? defaults.effects,
   };
 }
 
@@ -114,6 +161,7 @@ export interface SynthStore extends SynthEngineState {
   activeNotes: Record<number, number>;
   keyboardOctave: number;
   defaultVelocity: number;
+  setEngineMode: (mode: EngineMode) => void;
   updateOscA: (partial: Partial<OscillatorState>) => void;
   updateOscB: (partial: Partial<OscillatorState>) => void;
   updateSubOsc: (partial: Partial<SubOscillatorState>) => void;
@@ -125,6 +173,8 @@ export interface SynthStore extends SynthEngineState {
   updateWaveStep: (index: number, partial: Partial<WaveStep>) => void;
   reorderWaveSteps: (from: number, to: number) => void;
   updateVectorPosition: (partial: Partial<VectorMixerState>) => void;
+  updateSampleLayer: (partial: Partial<SampleLayerState>) => void;
+  loadSamplePreset: (bankId: string, presetId: string) => void;
   addEffect: (effect: EffectState) => void;
   updateEffect: (id: string, partial: Partial<EffectState>) => void;
   removeEffect: (id: string) => void;
@@ -156,6 +206,7 @@ export const useSynthStore = create<SynthStore>((set) => ({
   activeNotes: {},
   keyboardOctave: 3,
   defaultVelocity: 0.82,
+  setEngineMode: (mode) => set({ engineMode: mode }),
   updateOscA: (partial) => set((state) => ({ oscA: { ...state.oscA, ...partial } })),
   updateOscB: (partial) => set((state) => ({ oscB: { ...state.oscB, ...partial } })),
   updateSubOsc: (partial) => set((state) => ({ subOsc: { ...state.subOsc, ...partial } })),
@@ -179,6 +230,19 @@ export const useSynthStore = create<SynthStore>((set) => ({
       },
     })),
   updateVectorPosition: (partial) => set((state) => ({ vectorMixer: { ...state.vectorMixer, ...partial } })),
+  updateSampleLayer: (partial) => set((state) => ({ sampleLayer: { ...state.sampleLayer, ...partial } })),
+  loadSamplePreset: (bankId, presetId) =>
+    set((state) => ({
+      engineMode: state.engineMode === 'hybrid' ? 'hybrid' : 'sample',
+      sampleLayer: {
+        ...state.sampleLayer,
+        enabled: true,
+        bankId,
+        presetId,
+      },
+      currentPreset: `sample:${bankId}:${presetId}`,
+      activeNotes: {},
+    })),
   addEffect: (effect) => set((state) => ({ effects: [...state.effects, effect] })),
   updateEffect: (id, partial) =>
     set((state) => ({
@@ -186,7 +250,7 @@ export const useSynthStore = create<SynthStore>((set) => ({
     })),
   removeEffect: (id) => set((state) => ({ effects: state.effects.filter((effect) => effect.id !== id) })),
   reorderEffects: (from, to) => set((state) => ({ effects: reorder(state.effects, from, to) })),
-  loadPreset: (preset) => set({ ...preset.engine, currentPreset: preset.id, activeNotes: {} }),
+  loadPreset: (preset) => set({ ...normalizeEngineState(preset.engine), currentPreset: preset.id, activeNotes: {} }),
   savePreset: (id) => set({ currentPreset: id }),
   resetSynth: () => set({ ...createDefaultEngineState(), activeNotes: {} }),
   setMasterVolume: (value) => set({ masterVolume: value }),
@@ -206,6 +270,7 @@ export const useSynthStore = create<SynthStore>((set) => ({
 
 export function selectEngineState(state: SynthStore): SynthEngineState {
   return {
+    engineMode: state.engineMode,
     masterVolume: state.masterVolume,
     bpm: state.bpm,
     polyphony: state.polyphony,
@@ -220,6 +285,7 @@ export function selectEngineState(state: SynthStore): SynthEngineState {
     lfo2: state.lfo2,
     waveSequencer: state.waveSequencer,
     vectorMixer: state.vectorMixer,
+    sampleLayer: state.sampleLayer,
     effects: state.effects,
     currentPreset: state.currentPreset,
   };

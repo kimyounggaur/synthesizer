@@ -3336,6 +3336,304 @@
     gap: 0.7rem;
   }
 
+  .workstation-led-dot {
+    display: inline-block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 1px solid rgba(81, 245, 198, 0.35);
+    border-radius: 999px;
+    background: #10171a;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.65);
+  }
+
+  .workstation-led-dot.is-active,
+  .modulation-route-row.is-active .workstation-led-dot {
+    background: #51f5c6;
+    box-shadow: 0 0 14px rgba(81, 245, 198, 0.78);
+  }
+
+  .workstation-led-dot.is-small {
+    width: 0.48rem;
+    height: 0.48rem;
+  }
+
+  .modulation-page-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .modulation-lfo-card {
+    gap: 0.7rem;
+  }
+
+  .modulation-status-stack {
+    display: grid;
+    gap: 0.4rem;
+    justify-items: end;
+  }
+
+  .modulation-sync-badge {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 5px;
+    background: rgba(7, 10, 13, 0.72);
+    color: #9db4b8;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.66rem;
+    font-weight: 900;
+    padding: 0.25rem 0.42rem;
+  }
+
+  .modulation-sync-badge.is-active {
+    border-color: rgba(81, 245, 198, 0.48);
+    color: #c7fff0;
+  }
+
+  .modulation-control-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .modulation-knob-grid {
+    grid-template-columns: repeat(2, minmax(72px, 1fr));
+  }
+
+  .modulation-routing-list {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .modulation-route-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+    min-height: 2rem;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 5px;
+    background: rgba(4, 8, 10, 0.5);
+    color: #aab9bc;
+    font-size: 0.74rem;
+    font-weight: 800;
+    padding: 0.28rem 0.45rem;
+    text-align: left;
+  }
+
+  .modulation-route-row span:nth-child(2) {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .modulation-route-row strong {
+    color: #6ff0ff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+  }
+
+  .modulation-route-row.is-active {
+    border-color: rgba(81, 245, 198, 0.45);
+    background: rgba(81, 245, 198, 0.08);
+    color: #eefcf8;
+  }
+
+  .wave-vector-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+    grid-template-areas:
+      "pad detail"
+      "lane detail";
+    gap: 0.75rem;
+  }
+
+  .wave-vector-pad-card {
+    grid-area: pad;
+  }
+
+  .wave-vector-lane-card {
+    grid-area: lane;
+  }
+
+  .wave-vector-step-card {
+    grid-area: detail;
+  }
+
+  .workstation-vector-pad {
+    aspect-ratio: 1 / 0.58;
+    min-height: 14rem;
+    cursor: crosshair;
+  }
+
+  .workstation-vector-pad:focus-visible {
+    outline: 2px solid rgba(81, 245, 198, 0.58);
+    outline-offset: 2px;
+  }
+
+  .wave-vector-weights {
+    align-self: stretch;
+  }
+
+  .wave-vector-mix-knobs {
+    grid-template-columns: repeat(2, minmax(72px, 1fr));
+  }
+
+  .workstation-wave-lane {
+    grid-template-columns: repeat(16, minmax(0, 1fr));
+  }
+
+  .wave-vector-step-knobs {
+    grid-template-columns: repeat(2, minmax(68px, 1fr));
+  }
+
+  .effects-page-layout {
+    display: grid;
+    grid-template-columns: minmax(220px, 0.55fr) minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .effects-control-card,
+  .effects-chain-card {
+    align-content: start;
+  }
+
+  .effects-add-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    align-items: end;
+  }
+
+  .effects-add-button {
+    min-width: 5.8rem;
+    min-height: 2.1rem;
+    font-size: 0.76rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .effects-default-slots {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .effects-default-slot {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.55rem;
+    align-items: center;
+    min-height: 2.35rem;
+    border: 1px solid rgba(242, 184, 75, 0.18);
+    border-radius: 5px;
+    background: rgba(8, 8, 10, 0.58);
+    padding: 0.35rem 0.5rem;
+    text-align: left;
+  }
+
+  .effects-default-slot span,
+  .effects-master-slot span {
+    color: #aeb9c0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.66rem;
+    font-weight: 900;
+  }
+
+  .effects-default-slot strong,
+  .effects-master-slot strong {
+    min-width: 0;
+    overflow: hidden;
+    color: #ffe2a6;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .effects-default-slot.is-loaded {
+    border-color: rgba(81, 245, 198, 0.42);
+    background: rgba(81, 245, 198, 0.07);
+  }
+
+  .effects-chain-card {
+    grid-column: 2;
+  }
+
+  .effects-chain-view {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+  }
+
+  .effects-chain-node {
+    position: relative;
+    border: 1px solid rgba(94, 232, 255, 0.2);
+    border-radius: 5px;
+    background: rgba(5, 8, 12, 0.7);
+    color: #c8d8dc;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 900;
+    padding: 0.38rem 0.5rem;
+  }
+
+  .effects-chain-node:not(:last-child)::after {
+    content: ">";
+    margin-left: 0.42rem;
+    color: rgba(94, 232, 255, 0.6);
+  }
+
+  .effects-chain-node.is-fx {
+    border-color: rgba(81, 245, 198, 0.4);
+    color: #c7fff0;
+  }
+
+  .effects-master-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .effects-master-slot {
+    display: grid;
+    gap: 0.25rem;
+    border: 1px solid rgba(94, 232, 255, 0.18);
+    border-radius: 5px;
+    background: rgba(5, 8, 12, 0.52);
+    padding: 0.48rem 0.55rem;
+  }
+
+  .effects-insert-rack {
+    display: grid;
+    grid-column: 1 / -1;
+    gap: 0.65rem;
+  }
+
+  .effects-workstation-slot {
+    gap: 0.65rem;
+  }
+
+  .effects-order-button {
+    min-width: 3.5rem;
+    min-height: 2.15rem;
+    font-size: 0.72rem;
+    font-weight: 900;
+    padding: 0 0.55rem;
+    text-transform: uppercase;
+  }
+
+  .effects-order-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.42;
+  }
+
+  .effects-workstation-knobs {
+    grid-template-columns: repeat(4, minmax(62px, 1fr));
+  }
+
+  .workstation-effects-empty {
+    min-height: 4rem;
+  }
+
   @media (min-width: 1600px) {
     .main-console-grid {
       grid-template-columns: minmax(0, 1fr) minmax(520px, 620px);
@@ -3448,8 +3746,34 @@
     .workstation-envelope-graphs,
     .workstation-filter-knobs,
     .workstation-osc-knobs,
-    .workstation-env-knobs {
+    .workstation-env-knobs,
+    .modulation-page-grid,
+    .modulation-control-grid,
+    .modulation-knob-grid,
+    .wave-vector-mix-knobs,
+    .wave-vector-step-knobs,
+    .effects-page-layout,
+    .effects-add-row,
+    .effects-master-grid,
+    .effects-workstation-knobs {
       grid-template-columns: 1fr;
+    }
+
+    .wave-vector-layout {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "pad"
+        "lane"
+        "detail";
+    }
+
+    .workstation-wave-lane {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .effects-chain-card,
+    .effects-insert-rack {
+      grid-column: auto;
     }
 
     .workstation-subtabs {

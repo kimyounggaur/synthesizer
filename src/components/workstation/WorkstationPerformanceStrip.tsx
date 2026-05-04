@@ -75,7 +75,7 @@ export function WorkstationPerformanceStrip({ onPanic, onTestTone }: Workstation
         <button type="button" className="performance-button" onClick={onTestTone}>
           TEST TONE
         </button>
-        <button type="button" className="performance-button is-danger" onClick={onPanic}>
+        <button type="button" className="performance-button is-danger" aria-label="Panic: stop all notes and clear active voices" onClick={onPanic}>
           PANIC
         </button>
       </div>

@@ -2,11 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { factoryPresets } from '../../../presets/factoryPresets';
 import { sampleFactoryPresets } from '../../../presets/sampleFactoryPresets';
 import { usePresetStore } from '../../../store/presetStore';
-import { useSynthStore } from '../../../store/synthStore';
+import { selectEngineState, useSynthStore } from '../../../store/synthStore';
 import type { SynthPreset } from '../../../types/synth';
+import { createUserPreset, exportPresets, parsePresetImport } from '../../../utils/presetStorage';
 import { MiniDisplay } from '../../ui/MiniDisplay';
 import { PresetArtwork } from '../../PresetArtwork';
-import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
+import { WorkstationBreadcrumb, WorkstationPageTabs, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 type ProgramBankId = 'A' | 'B' | 'C';
 type ProgramCategoryFilter = SynthPreset['category'] | 'All';
@@ -32,10 +33,16 @@ function bankTitle(bank: ProgramBank): string {
 export function ProgramPage() {
   const [selectedBankId, setSelectedBankId] = useState<ProgramBankId>('A');
   const [selectedCategory, setSelectedCategory] = useState<ProgramCategoryFilter>('All');
+  const [query, setQuery] = useState('');
+  const [importText, setImportText] = useState('');
   const currentPreset = useSynthStore((state) => state.currentPreset);
   const loadPreset = useSynthStore((state) => state.loadPreset);
+  const savePresetMarker = useSynthStore((state) => state.savePreset);
   const userPresets = usePresetStore((state) => state.userPresets);
   const loadUserPresets = usePresetStore((state) => state.loadUserPresets);
+  const saveUserPreset = usePresetStore((state) => state.saveUserPreset);
+  const deleteUserPreset = usePresetStore((state) => state.deleteUserPreset);
+  const importUserPresets = usePresetStore((state) => state.importUserPresets);
 
   useEffect(() => {
     loadUserPresets();
@@ -69,21 +76,52 @@ export function ProgramPage() {
   );
 
   const selectedBank = banks.find((bank) => bank.id === selectedBankId) ?? banks[0];
-  const visiblePrograms = useMemo(
-    () => selectedBank.presets.filter((preset) => selectedCategory === 'All' || preset.category === selectedCategory),
-    [selectedBank.presets, selectedCategory],
-  );
+  const visiblePrograms = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+    return selectedBank.presets.filter((preset) => {
+      const matchesCategory = selectedCategory === 'All' || preset.category === selectedCategory;
+      const matchesQuery = !normalizedQuery || `${preset.name} ${preset.category} ${preset.author}`.toLowerCase().includes(normalizedQuery);
+      return matchesCategory && matchesQuery;
+    });
+  }, [selectedBank.presets, selectedCategory, query]);
   const activeProgram = visiblePrograms.find((preset) => preset.id === currentPreset) ?? visiblePrograms[0] ?? selectedBank.presets[0] ?? null;
+
+  const handleSave = () => {
+    const name = window.prompt('Preset name');
+    if (!name?.trim()) {
+      return;
+    }
+    const preset = createUserPreset(name.trim(), selectEngineState(useSynthStore.getState()));
+    saveUserPreset(preset);
+    savePresetMarker(preset.id);
+    setSelectedBankId('C');
+  };
+
+  const handleExport = async () => {
+    const exported = exportPresets(userPresets);
+    setImportText(exported);
+    try {
+      await navigator.clipboard.writeText(exported);
+    } catch {
+      window.alert('Clipboard permission was blocked. Export JSON has been placed in the preset text box.');
+    }
+  };
+
+  const handleImport = () => {
+    try {
+      importUserPresets(parsePresetImport(importText));
+      setImportText('');
+      setSelectedBankId('C');
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'Preset import failed.');
+    }
+  };
 
   return (
     <div className="workstation-page workstation-lcd-page program-page">
       <header className="workstation-page-header">
         <MiniDisplay eyebrow="PROGRAM" value={activeProgram?.name.toUpperCase() ?? 'NO PROGRAM'} detail={activeProgram ? `${activeProgram.category} / ${activeProgram.author}` : bankTitle(selectedBank)} tone="cyan" />
-        <nav className="workstation-tabs" aria-label="Program sections">
-          <span className="workstation-tab is-active">BANK</span>
-          <span className="workstation-tab">CATEGORY</span>
-          <span className="workstation-tab">PROGRAM LIST</span>
-        </nav>
+        <WorkstationPageTabs labels={['BANK', 'CATEGORY', 'PROGRAM LIST']} ariaLabel="Program sections" variant="tabs" />
       </header>
 
       <WorkstationBreadcrumb items={['PROGRAM', selectedBank.label, selectedCategory === 'All' ? 'All' : selectedCategory, activeProgram?.name ?? 'No Program']} />
@@ -117,17 +155,26 @@ export function ProgramPage() {
             <div className="workstation-lcd-screen program-lcd-screen">
               <div className="program-list-heading">
                 <MiniDisplay eyebrow={bankTitle(selectedBank)} value={`${visiblePrograms.length} PROGRAMS`} detail={selectedCategory === 'All' ? selectedBank.detail : selectedCategory} tone="mint" />
+                <input className="mini-input panel-input" value={query} placeholder="Search programs" onChange={(event) => setQuery(event.target.value)} />
               </div>
 
               <div className="program-list" aria-label="Program list">
                 {visiblePrograms.map((preset, index) => {
                   const active = preset.id === currentPreset;
+                  const userOwned = preset.author === 'User';
                   return (
-                    <button key={preset.id} type="button" className={active ? 'program-row is-active' : 'program-row'} onClick={() => loadPreset(preset)}>
-                      <span className="program-number">{programNumber(index)}</span>
-                      <span className="program-name">{preset.name}</span>
-                      <span className="program-category">{preset.category}</span>
-                    </button>
+                    <div key={preset.id} className={active ? 'program-row is-active' : 'program-row'}>
+                      <button type="button" className="program-row-load" onClick={() => loadPreset(preset)}>
+                        <span className="program-number">{programNumber(index)}</span>
+                        <span className="program-name">{preset.name}</span>
+                        <span className="program-category">{preset.category}</span>
+                      </button>
+                      {userOwned ? (
+                        <button type="button" className="program-delete-button" aria-label={`Delete user program ${preset.name}`} onClick={() => deleteUserPreset(preset.id)}>
+                          Del
+                        </button>
+                      ) : null}
+                    </div>
                   );
                 })}
                 {visiblePrograms.length === 0 ? <div className="effects-empty workstation-effects-empty">No programs in this category.</div> : null}
@@ -146,6 +193,22 @@ export function ProgramPage() {
             <button type="button" className="soft-button program-load-button" disabled={!activeProgram} onClick={() => activeProgram && loadPreset(activeProgram)}>
               Load Program
             </button>
+          </section>
+
+          <section className="module-block module-block-mint workstation-card">
+            <MiniDisplay eyebrow="Program Tools" value="STORE" detail={`${userPresets.length} user programs`} tone="mint" />
+            <div className="program-tool-grid">
+              <button type="button" className="soft-button program-load-button" onClick={handleSave}>
+                Save
+              </button>
+              <button type="button" className="soft-button program-load-button" onClick={() => void handleExport()}>
+                Export
+              </button>
+              <button type="button" className="soft-button program-load-button" onClick={handleImport}>
+                Import
+              </button>
+            </div>
+            <textarea className="mini-input program-import-textarea" value={importText} placeholder="Preset JSON" onChange={(event) => setImportText(event.target.value)} />
           </section>
 
           <section className="module-block module-block-amber workstation-card">

@@ -5,7 +5,7 @@ import type { EngineMode, SampleBankManifest, SampleCategory, SamplePresetDefini
 import { Knob } from '../../ui/Knob';
 import { LedButton } from '../../ui/LedButton';
 import { MiniDisplay } from '../../ui/MiniDisplay';
-import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar, type WorkstationStatus } from '../WorkstationLCDChrome';
+import { WorkstationBreadcrumb, WorkstationPageTabs, WorkstationSoftKeys, WorkstationStatusBar, type WorkstationStatus } from '../WorkstationLCDChrome';
 
 type SampleFilter = SampleCategory | 'All';
 
@@ -191,11 +191,7 @@ export function SamplePage() {
     <div className="workstation-page workstation-lcd-page sample-page">
       <header className="workstation-page-header">
         <MiniDisplay eyebrow="SAMPLE" value={activePreset?.name.toUpperCase() ?? 'NO SAMPLE'} detail={activeBank?.name ?? `${visiblePresets.length} presets`} tone="mint" />
-        <nav className="workstation-tabs" aria-label="Sample sections">
-          <span className="workstation-tab is-active">BROWSER</span>
-          <span className="workstation-tab">LAYER</span>
-          <span className="workstation-tab">FILTER</span>
-        </nav>
+        <WorkstationPageTabs labels={['BROWSER', 'LAYER', 'FILTER']} ariaLabel="Sample sections" variant="tabs" />
       </header>
 
       <WorkstationBreadcrumb items={['SAMPLE', activeBank?.name ?? (selectedBankId === 'All' ? 'ALL BANKS' : selectedBankId), selectedFilter === 'All' ? 'All' : selectedFilter, activePreset?.name ?? 'No Sample']} />
@@ -273,6 +269,8 @@ export function SamplePage() {
             <div className="workstation-knob-grid sample-page-knobs">
               <Knob label="Level" min={0} max={1.5} step={0.01} value={sampleLayer.level} onChange={(value) => updateSampleLayer({ level: value })} displayValue={formatPercent(sampleLayer.level)} tone="mint" />
               <Knob label="Attack" min={0.001} max={4} step={0.001} value={sampleLayer.attack} onChange={(value) => updateSampleLayer({ attack: value })} displayValue={formatTime(sampleLayer.attack)} tone="violet" />
+              <Knob label="Decay" min={0.001} max={4} step={0.001} value={sampleLayer.decay} onChange={(value) => updateSampleLayer({ decay: value })} displayValue={formatTime(sampleLayer.decay)} tone="violet" />
+              <Knob label="Sustain" min={0} max={1} step={0.01} value={sampleLayer.sustain} onChange={(value) => updateSampleLayer({ sustain: value })} displayValue={formatPercent(sampleLayer.sustain)} tone="amber" />
               <Knob label="Release" min={0.001} max={6} step={0.001} value={sampleLayer.release} onChange={(value) => updateSampleLayer({ release: value })} displayValue={formatTime(sampleLayer.release)} tone="violet" />
             </div>
           </section>

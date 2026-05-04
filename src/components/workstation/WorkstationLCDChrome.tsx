@@ -24,6 +24,12 @@ interface WorkstationStatusBarProps {
   status?: WorkstationStatus;
 }
 
+interface WorkstationPageTabsProps {
+  labels: string[];
+  ariaLabel: string;
+  variant?: 'tabs' | 'subtabs';
+}
+
 function statusClassName(status: WorkstationStatus): string {
   return `workstation-status-${status.toLowerCase().replace(/\s+/g, '-')}`;
 }
@@ -53,6 +59,24 @@ export function WorkstationSoftKeys({ enabledKeys = [] }: WorkstationSoftKeysPro
         );
       })}
     </div>
+  );
+}
+
+export function WorkstationPageTabs({ labels, ariaLabel, variant = 'subtabs' }: WorkstationPageTabsProps) {
+  const className = variant === 'tabs' ? 'workstation-tabs' : 'workstation-subtabs';
+  const tabClassName = variant === 'tabs' ? 'workstation-tab' : 'workstation-subtab';
+
+  return (
+    <nav className={className} role="tablist" aria-label={ariaLabel}>
+      {labels.map((label, index) => {
+        const active = index === 0;
+        return (
+          <button key={label} type="button" role="tab" aria-selected={active} tabIndex={active ? 0 : -1} className={active ? `${tabClassName} is-active` : tabClassName}>
+            {label}
+          </button>
+        );
+      })}
+    </nav>
   );
 }
 

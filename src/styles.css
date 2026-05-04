@@ -2885,6 +2885,16 @@
     accent-color: #6ff0ff;
   }
 
+  .sample-bank-error {
+    border: 1px solid rgba(255, 122, 93, 0.36);
+    border-radius: 6px;
+    background: rgba(255, 122, 93, 0.08);
+    color: #ffd0c7;
+    font-size: 0.72rem;
+    line-height: 1.25;
+    padding: 0.5rem;
+  }
+
   .sample-preset-main {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);

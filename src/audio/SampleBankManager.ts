@@ -1,5 +1,5 @@
 import type { SampleBankManifest, SamplePresetDefinition, SampleZone } from '../types/synth';
-import { clamp } from '../utils/audioMath';
+import { clamp, midiNoteToFrequency } from '../utils/audioMath';
 
 interface RegisteredSampleBank {
   manifest: SampleBankManifest;
@@ -127,7 +127,9 @@ export class SampleBankManager {
       return cached;
     }
 
-    const promise = resolvedUrl.startsWith(generatedUrlPrefix) ? this.createGeneratedBuffer(context, resolvedUrl) : this.fetchAudioBuffer(context, resolvedUrl);
+    const promise = resolvedUrl.startsWith(generatedUrlPrefix)
+      ? this.createGeneratedBuffer(context, resolvedUrl)
+      : this.fetchAudioBuffer(context, resolvedUrl).catch(() => this.createFallbackBuffer(context, zone, resolvedUrl));
     contextCache.set(resolvedUrl, promise);
     return promise;
   }
@@ -150,6 +152,53 @@ export class SampleBankManager {
 
     const bytes = await response.arrayBuffer();
     return context.decodeAudioData(bytes.slice(0));
+  }
+
+  private async createFallbackBuffer(context: AudioContext, zone: SampleZone, url: string): Promise<AudioBuffer> {
+    const id = `${zone.id}:${url}`;
+    const baseFrequency = midiNoteToFrequency(zone.rootNote);
+    const lowerId = id.toLowerCase();
+    const sampleRate = context.sampleRate;
+    const seconds = lowerId.includes('string') ? 1.55 : lowerId.includes('drum') || lowerId.includes('hit') ? 1.1 : 2.2;
+    const buffer = context.createBuffer(1, Math.ceil(sampleRate * seconds), sampleRate);
+    const channel = buffer.getChannelData(0);
+    const random = seededRandom(seedFromString(id));
+
+    for (let index = 0; index < channel.length; index += 1) {
+      const time = index / sampleRate;
+      const attack = 1 - Math.exp(-time * 120);
+      let sample = 0;
+
+      if (lowerId.includes('string')) {
+        const fadeIn = Math.min(1, time / 0.25);
+        const slowMotion = 1 + Math.sin(Math.PI * 2 * 0.42 * time) * 0.014;
+        sample =
+          Math.sin(Math.PI * 2 * baseFrequency * slowMotion * time) * 0.48 +
+          Math.sin(Math.PI * 2 * baseFrequency * 2.003 * time) * 0.23 +
+          Math.sin(Math.PI * 2 * baseFrequency * 3.01 * time) * 0.11 +
+          random() * 0.012;
+        sample *= fadeIn * 0.74;
+      } else if (lowerId.includes('piano')) {
+        const envelope = attack * Math.exp(-time * 1.55);
+        sample =
+          Math.sin(Math.PI * 2 * baseFrequency * time) * 0.56 +
+          Math.sin(Math.PI * 2 * baseFrequency * 2.01 * time) * 0.18 +
+          Math.sin(Math.PI * 2 * baseFrequency * 3.02 * time) * 0.08 +
+          random() * 0.01;
+        sample *= envelope;
+      } else {
+        const envelope = attack * Math.exp(-time * 1.35);
+        sample =
+          Math.sin(Math.PI * 2 * baseFrequency * time) * 0.55 +
+          Math.sin(Math.PI * 2 * baseFrequency * 2 * time) * 0.17 +
+          random() * 0.014;
+        sample *= envelope;
+      }
+
+      channel[index] = clamp(sample, -1, 1);
+    }
+
+    return buffer;
   }
 
   private async createGeneratedBuffer(context: AudioContext, url: string): Promise<AudioBuffer> {

@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
-import { sampleBankManager } from '../samples/sampleBankLibrary';
+import { useEffect, useMemo, useState } from 'react';
+import { loadPublicSampleBanks, sampleBankManager } from '../samples/sampleBankLibrary';
 import { useSynthStore } from '../store/synthStore';
-import type { EngineMode, SampleCategory, SamplePresetDefinition } from '../types/synth';
+import type { EngineMode, SampleBankManifest, SampleCategory, SamplePresetDefinition } from '../types/synth';
 import { Knob } from './ui/Knob';
 
 type SampleFilter = SampleCategory | 'All';
@@ -47,13 +47,34 @@ export function SamplePresetBrowser() {
   const [query, setQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<SampleFilter>('All');
   const [selectedBankId, setSelectedBankId] = useState<BankFilter>('All');
+  const [banks, setBanks] = useState<SampleBankManifest[]>(() => sampleBankManager.getBankManifests());
+  const [sampleBankLoadError, setSampleBankLoadError] = useState<string | null>(null);
   const engineMode = useSynthStore((state) => state.engineMode);
   const sampleLayer = useSynthStore((state) => state.sampleLayer);
   const setEngineMode = useSynthStore((state) => state.setEngineMode);
   const updateSampleLayer = useSynthStore((state) => state.updateSampleLayer);
   const loadSamplePreset = useSynthStore((state) => state.loadSamplePreset);
 
-  const banks = useMemo(() => sampleBankManager.getBankManifests(), []);
+  useEffect(() => {
+    let mounted = true;
+    loadPublicSampleBanks()
+      .then(() => {
+        if (mounted) {
+          setBanks(sampleBankManager.getBankManifests());
+          setSampleBankLoadError(null);
+        }
+      })
+      .catch((error) => {
+        if (mounted) {
+          setSampleBankLoadError(error instanceof Error ? error.message : 'Sample bank manifest failed to load.');
+        }
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   const presets = useMemo<BrowserSamplePreset[]>(
     () =>
       banks.flatMap((bank) =>
@@ -149,6 +170,7 @@ export function SamplePresetBrowser() {
               <input type="checkbox" checked={sampleLayer.preload} onChange={(event) => updateSampleLayer({ preload: event.target.checked })} />
               <span>Preload</span>
             </label>
+            {sampleBankLoadError ? <div className="sample-bank-error">{sampleBankLoadError}</div> : null}
           </div>
         </aside>
 

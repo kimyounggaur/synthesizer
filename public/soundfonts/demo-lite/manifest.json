@@ -1,0 +1,89 @@
+{
+  "id": "demo-lite",
+  "name": "Demo Lite Sample Bank",
+  "author": "Project",
+  "description": "Demo sample bank for testing the sample preset layer. Uses generated fallback buffers if sample files are unavailable.",
+  "license": "Internal demo / generated only",
+  "presets": [
+    {
+      "id": "soft-piano-lite",
+      "name": "Soft Piano Lite",
+      "category": "Piano",
+      "author": "Project",
+      "description": "Lightweight demo piano-like sample preset.",
+      "license": "Generated demo",
+      "zones": [
+        {
+          "id": "piano-c3",
+          "url": "samples/piano-c3.wav",
+          "rootNote": 48,
+          "lowNote": 36,
+          "highNote": 53,
+          "loop": false,
+          "gain": 0.85
+        },
+        {
+          "id": "piano-c4",
+          "url": "samples/piano-c4.wav",
+          "rootNote": 60,
+          "lowNote": 54,
+          "highNote": 65,
+          "loop": false,
+          "gain": 0.85
+        },
+        {
+          "id": "piano-c5",
+          "url": "samples/piano-c5.wav",
+          "rootNote": 72,
+          "lowNote": 66,
+          "highNote": 84,
+          "loop": false,
+          "gain": 0.85
+        }
+      ]
+    },
+    {
+      "id": "warm-strings-lite",
+      "name": "Warm Strings Lite",
+      "category": "Strings",
+      "author": "Project",
+      "description": "Looping string-like demo preset.",
+      "license": "Generated demo",
+      "zones": [
+        {
+          "id": "strings-c3",
+          "url": "samples/strings-c3.wav",
+          "rootNote": 48,
+          "lowNote": 36,
+          "highNote": 55,
+          "loop": true,
+          "loopStart": 0.25,
+          "loopEnd": 1.2,
+          "gain": 0.8
+        },
+        {
+          "id": "strings-c4",
+          "url": "samples/strings-c4.wav",
+          "rootNote": 60,
+          "lowNote": 56,
+          "highNote": 67,
+          "loop": true,
+          "loopStart": 0.25,
+          "loopEnd": 1.2,
+          "gain": 0.8
+        },
+        {
+          "id": "strings-c5",
+          "url": "samples/strings-c5.wav",
+          "rootNote": 72,
+          "lowNote": 68,
+          "highNote": 84,
+          "loop": true,
+          "loopStart": 0.25,
+          "loopEnd": 1.2,
+          "gain": 0.8
+        }
+      ]
+    }
+  ]
+}

@@ -3159,6 +3159,183 @@
     margin-top: -0.15rem;
   }
 
+  .workstation-lcd-page {
+    display: grid;
+    min-width: 0;
+    gap: 0.85rem;
+    border: 1px solid rgba(81, 245, 198, 0.24);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(81, 245, 198, 0.07), rgba(66, 198, 255, 0.025)),
+      #080d10;
+    padding: 0.85rem;
+    box-shadow: inset 0 0 28px rgba(81, 245, 198, 0.06);
+  }
+
+  .workstation-page-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.7rem;
+    align-items: center;
+  }
+
+  .workstation-subtabs {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    justify-content: flex-end;
+  }
+
+  .workstation-subtab {
+    min-height: 1.9rem;
+    border: 1px solid rgba(81, 245, 198, 0.2);
+    border-radius: 5px;
+    background: rgba(6, 10, 13, 0.78);
+    color: #9db4b8;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 900;
+    padding: 0.42rem 0.55rem;
+  }
+
+  .workstation-subtab.is-active {
+    border-color: rgba(81, 245, 198, 0.6);
+    color: #c7fff0;
+  }
+
+  .workstation-page-grid {
+    display: grid;
+    min-width: 0;
+    gap: 0.75rem;
+  }
+
+  .workstation-osc-grid,
+  .filter-amp-visual-grid,
+  .filter-amp-envelope-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workstation-card {
+    display: grid;
+    min-width: 0;
+    gap: 0.72rem;
+    align-content: start;
+  }
+
+  .workstation-card-wide {
+    min-height: 0;
+  }
+
+  .workstation-card-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(112px, 0.42fr);
+    gap: 0.65rem;
+    align-items: center;
+  }
+
+  .workstation-select-control .mini-select {
+    min-height: 2rem;
+    font-size: 0.78rem;
+  }
+
+  .workstation-knob-grid {
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .workstation-osc-knobs,
+  .workstation-env-knobs {
+    grid-template-columns: repeat(4, minmax(56px, 1fr));
+  }
+
+  .workstation-source-grid {
+    display: grid;
+    grid-template-columns: minmax(112px, 1fr) repeat(2, minmax(56px, 0.72fr));
+    gap: 0.6rem;
+    align-items: end;
+  }
+
+  .workstation-noise-grid {
+    grid-template-columns: minmax(112px, 1fr) minmax(64px, 0.72fr);
+  }
+
+  .workstation-filter-curve {
+    height: 7rem;
+  }
+
+  .filter-amp-graph-card {
+    gap: 0.65rem;
+  }
+
+  .workstation-envelope-graphs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .workstation-envelope-graph {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(242, 184, 75, 0.2);
+    border-radius: 6px;
+    background:
+      linear-gradient(180deg, rgba(242, 184, 75, 0.08), rgba(0, 0, 0, 0.02)),
+      #090d10;
+    padding: 0.45rem;
+  }
+
+  .workstation-envelope-graph-red {
+    border-color: rgba(255, 115, 115, 0.24);
+  }
+
+  .workstation-graph-label {
+    color: #b9c8c8;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .workstation-envelope-graph svg {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1.45;
+    margin-top: 0.28rem;
+  }
+
+  .workstation-graph-grid {
+    fill: none;
+    stroke: rgba(148, 163, 184, 0.16);
+    stroke-width: 1;
+  }
+
+  .workstation-adsr-path {
+    fill: none;
+    stroke: #f2b84b;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 4;
+    filter: drop-shadow(0 0 4px rgba(242, 184, 75, 0.35));
+  }
+
+  .workstation-envelope-graph-red .workstation-adsr-path {
+    stroke: #ff7373;
+    filter: drop-shadow(0 0 4px rgba(255, 115, 115, 0.35));
+  }
+
+  .filter-amp-filter-knobs {
+    align-content: stretch;
+  }
+
+  .workstation-filter-knobs {
+    grid-template-columns: repeat(5, minmax(62px, 1fr));
+  }
+
+  .workstation-envelope-card {
+    gap: 0.7rem;
+  }
+
   @media (min-width: 1600px) {
     .main-console-grid {
       grid-template-columns: minmax(0, 1fr) minmax(520px, 620px);
@@ -3259,6 +3436,24 @@
 
     .sample-slider-row strong {
       text-align: left;
+    }
+
+    .workstation-page-header,
+    .workstation-card-header,
+    .workstation-osc-grid,
+    .filter-amp-visual-grid,
+    .filter-amp-envelope-grid,
+    .workstation-source-grid,
+    .workstation-noise-grid,
+    .workstation-envelope-graphs,
+    .workstation-filter-knobs,
+    .workstation-osc-knobs,
+    .workstation-env-knobs {
+      grid-template-columns: 1fr;
+    }
+
+    .workstation-subtabs {
+      justify-content: flex-start;
     }
   }
 

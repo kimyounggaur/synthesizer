@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { factoryPresets, presetCategoryOrder } from '../presets/factoryPresets';
+import { sampleFactoryPresets } from '../presets/sampleFactoryPresets';
 import { usePresetStore } from '../store/presetStore';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
 import type { MeterSnapshot, SynthPreset } from '../types/synth';
 import { createUserPreset, exportPresets, parsePresetImport } from '../utils/presetStorage';
 
 type PresetFilter = SynthPreset['category'] | 'All' | 'User';
+const allFactoryPresets = [...factoryPresets, ...sampleFactoryPresets];
 
 interface PresetBrowserProps {
   meter: MeterSnapshot;
@@ -39,7 +41,7 @@ export function PresetBrowser({ meter }: PresetBrowserProps) {
     loadUserPresets();
   }, [loadUserPresets]);
 
-  const allPresets = useMemo(() => [...factoryPresets, ...userPresets], [userPresets]);
+  const allPresets = useMemo(() => [...allFactoryPresets, ...userPresets], [userPresets]);
 
   const categoryCounts = useMemo(
     () =>

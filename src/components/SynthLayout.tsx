@@ -26,7 +26,7 @@ const panelLabels: Record<MovablePanelId, string> = {
   filter: 'Filter',
   envelopes: 'Envelopes',
   presets: 'Presets',
-  samples: 'Samples',
+  samples: 'Sample',
   lfo: 'LFO',
   vector: 'Vector',
   waveSeq: 'Wave Seq',

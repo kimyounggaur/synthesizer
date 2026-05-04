@@ -16,7 +16,7 @@ export function ProgramDisplay({ engine, preset, samplePreset, status }: Program
   const mode = engine.engineMode === 'synth' ? 'SYNTH' : engine.engineMode === 'sample' ? 'SAMPLE' : 'HYBRID';
 
   return (
-    <div className="program-display">
+    <div className="program-display workstation-program-lcd">
       <div className="program-display-copy">
         <div className="program-display-eyebrow">Program</div>
         <div className="program-display-name">{programName}</div>

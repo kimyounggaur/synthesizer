@@ -35,8 +35,8 @@ export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
   );
 
   return (
-    <header className="command-panel">
-      <div className="brand-plate">
+    <header className="command-panel workstation-topbar">
+      <div className="brand-plate workstation-brand-plate">
         <div className="brand-mark">M</div>
         <div>
           <div className="brand-name">M-WAVE SMK-37</div>

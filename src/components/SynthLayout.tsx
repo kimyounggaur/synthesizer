@@ -13,6 +13,7 @@ import { LFOPanel } from './LFOPanel';
 import { VectorMixerPanel } from './VectorMixerPanel';
 import { WaveSequencerPanel } from './WaveSequencerPanel';
 import { EffectsPanel } from './EffectsPanel';
+import { WorkstationPerformanceStrip } from './workstation/WorkstationPerformanceStrip';
 
 const silentMeter: MeterSnapshot = { peak: 0, rms: 0, clipping: false, audioState: 'unavailable', activeVoices: 0 };
 const PANEL_LAYOUT_KEY = 'wave-vector-hybrid-synth:panel-layout';
@@ -245,15 +246,15 @@ export function SynthLayout() {
   };
 
   return (
-    <main className="synth-workbench min-h-screen p-2 text-slate-100 md:p-3">
-      <div className="hardware-shell flex w-full max-w-none flex-col gap-4 p-3 md:p-4">
+    <main className="synth-workbench workstation-page min-h-screen p-2 text-slate-100 md:p-3">
+      <div className="hardware-shell workstation-shell flex w-full max-w-none flex-col gap-4 p-3 md:p-4">
         <TopBar onPanic={handlePanic} onTestTone={handleTestTone} meter={meter} />
 
         {engineError ? (
           <div className="panel border-amber-400/40 p-4 text-sm text-amber-100">{engineError}</div>
         ) : (
           <>
-            <section className="movable-console-grid" aria-label="Movable synth panels">
+            <section className="movable-console-grid workstation-main-deck" aria-label="Movable synth panels">
               {panelOrder.map((panelId) => (
                 <div
                   key={panelId}
@@ -296,7 +297,10 @@ export function SynthLayout() {
                 </div>
               ))}
             </section>
-            <Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />
+            <WorkstationPerformanceStrip onPanic={handlePanic} onTestTone={handleTestTone} />
+            <div className="workstation-keybed-frame">
+              <Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />
+            </div>
           </>
         )}
       </div>

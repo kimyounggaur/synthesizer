@@ -2,6 +2,7 @@ import type { LfoState, LfoTarget, SynthWaveform, TempoSyncValue } from '../../.
 import { useSynthStore } from '../../../store/synthStore';
 import { Knob } from '../../ui/Knob';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 const waveforms: SynthWaveform[] = ['sine', 'triangle', 'square', 'sawtooth', 'pulse', 'wavetable'];
 const targets: LfoTarget[] = ['filterCutoff', 'pitch', 'ampLevel', 'pan', 'oscMix', 'wavePosition'];
@@ -113,10 +114,15 @@ export function ModulationPage() {
         </nav>
       </header>
 
+      <WorkstationBreadcrumb items={['SYNTH', 'MODULATION', 'LFO MATRIX']} />
+
       <div className="workstation-page-grid modulation-page-grid">
         <LfoEditBlock title="LFO 1" lfo={lfo1} onChange={(partial) => updateLFO('lfo1', partial)} />
         <LfoEditBlock title="LFO 2" lfo={lfo2} onChange={(partial) => updateLFO('lfo2', partial)} />
       </div>
+
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message="LFO routing matrix ready" status="READY" />
     </div>
   );
 }

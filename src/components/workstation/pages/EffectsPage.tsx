@@ -5,6 +5,7 @@ import { createId } from '../../../utils/audioMath';
 import { Knob } from '../../ui/Knob';
 import { LedButton } from '../../ui/LedButton';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 const effectTypes: EffectType[] = ['chorus', 'delay', 'reverb', 'distortion', 'flanger', 'phaser', 'compressor', 'eq', 'bitcrusher', 'autoPan'];
 const defaultInsertTypes: EffectType[] = ['chorus', 'delay', 'reverb'];
@@ -69,6 +70,8 @@ export function EffectsPage() {
           <span className="workstation-subtab">CHAIN</span>
         </nav>
       </header>
+
+      <WorkstationBreadcrumb items={['SYNTH', 'EFFECTS', `${effects.length} INSERTS`]} />
 
       <div className="effects-page-layout">
         <section className="module-block module-block-amber workstation-card effects-control-card">
@@ -171,6 +174,9 @@ export function EffectsPage() {
           {effects.length === 0 ? <div className="effects-empty workstation-effects-empty">No insert effects loaded.</div> : null}
         </section>
       </div>
+
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message={chain.join(' -> ')} status="READY" />
     </div>
   );
 }

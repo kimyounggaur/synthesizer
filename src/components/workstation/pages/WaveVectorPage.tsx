@@ -5,6 +5,7 @@ import { useSynthStore } from '../../../store/synthStore';
 import { Knob } from '../../ui/Knob';
 import { LedButton } from '../../ui/LedButton';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 const waveforms: SynthWaveform[] = ['sine', 'square', 'sawtooth', 'triangle', 'pulse', 'wavetable'];
 
@@ -44,6 +45,8 @@ export function WaveVectorPage() {
           <span className="workstation-subtab">STEP DETAIL</span>
         </nav>
       </header>
+
+      <WorkstationBreadcrumb items={['SYNTH', 'WAVE / VECTOR', `STEP ${selectedStep + 1}`]} />
 
       <div className="wave-vector-layout">
         <section className="module-block module-block-mint workstation-card wave-vector-pad-card">
@@ -170,6 +173,9 @@ export function WaveVectorPage() {
           </div>
         </section>
       </div>
+
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message={`Wave sequence step ${selectedStep + 1} selected`} status="READY" />
     </div>
   );
 }

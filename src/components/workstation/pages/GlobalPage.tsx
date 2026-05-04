@@ -3,6 +3,7 @@ import { useSynthStore } from '../../../store/synthStore';
 import { Knob } from '../../ui/Knob';
 import { LedButton } from '../../ui/LedButton';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 const engineModes: EngineMode[] = ['synth', 'sample', 'hybrid'];
 
@@ -52,6 +53,8 @@ export function GlobalPage({ onPanic }: GlobalPageProps) {
           <span className="workstation-subtab">ABOUT</span>
         </nav>
       </header>
+
+      <WorkstationBreadcrumb items={['SYSTEM', 'GLOBAL SETTINGS', modeLabel(engineMode).toUpperCase()]} />
 
       <div className="workstation-page-grid global-page-grid">
         <section className="module-block module-block-mint workstation-card global-card">
@@ -127,6 +130,9 @@ export function GlobalPage({ onPanic }: GlobalPageProps) {
           </div>
         </section>
       </div>
+
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message={hasWebAudio ? 'Web Audio API ready' : 'Web Audio API unavailable'} status={hasWebAudio ? 'READY' : 'AUDIO SUSPENDED'} />
     </div>
   );
 }

@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { getCachedSampleBank, getCachedSamplePreset, loadPublicSampleBanks } from '../../../samples/sampleBankLibrary';
 import { useSynthStore } from '../../../store/synthStore';
 import type { EngineMode, SampleBankManifest, SampleCategory, SamplePresetDefinition } from '../../../types/soundfont';
 import { Knob } from '../../ui/Knob';
 import { LedButton } from '../../ui/LedButton';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar, type WorkstationStatus } from '../WorkstationLCDChrome';
 
 type SampleFilter = SampleCategory | 'All';
 
@@ -49,12 +50,40 @@ function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
 
+function isGeneratedSampleUrl(url: string): boolean {
+  return url.startsWith('generated://') || url.startsWith('data:');
+}
+
+function sampleZoneUrlForUi(bankId: string, zoneUrl: string): string {
+  if (isGeneratedSampleUrl(zoneUrl) || /^https?:\/\//i.test(zoneUrl)) {
+    return zoneUrl;
+  }
+
+  return `${import.meta.env.BASE_URL}soundfonts/${bankId}/${zoneUrl}`;
+}
+
+async function presetWillUseFallbackForUi(bankId: string, preset: SamplePresetDefinition): Promise<boolean> {
+  const probeZone = preset.zones.find((zone) => !isGeneratedSampleUrl(zone.url));
+  if (!probeZone) {
+    return false;
+  }
+
+  try {
+    const response = await fetch(sampleZoneUrlForUi(bankId, probeZone.url), { method: 'HEAD' });
+    return !response.ok;
+  } catch {
+    return true;
+  }
+}
+
 export function SamplePage() {
   const [query, setQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<SampleFilter>('All');
   const [selectedBankId, setSelectedBankId] = useState<string>('All');
   const [banks, setBanks] = useState<SampleBankManifest[]>([]);
   const [message, setMessage] = useState<string | null>(null);
+  const [sampleStatus, setSampleStatus] = useState<WorkstationStatus>('LOADING SAMPLE');
+  const sampleSelectionRequestId = useRef(0);
   const engineMode = useSynthStore((state) => state.engineMode);
   const sampleLayer = useSynthStore((state) => state.sampleLayer);
   const setEngineMode = useSynthStore((state) => state.setEngineMode);
@@ -63,15 +92,19 @@ export function SamplePage() {
 
   useEffect(() => {
     let mounted = true;
+    setSampleStatus('LOADING SAMPLE');
+    setMessage('Loading bank...');
     loadPublicSampleBanks()
       .then((manifests) => {
         if (mounted) {
           setBanks(manifests);
+          setSampleStatus('READY');
           setMessage(null);
         }
       })
       .catch((error) => {
         if (mounted) {
+          setSampleStatus('READY');
           setMessage(error instanceof Error ? error.message : 'Sample bank manifest failed to load.');
         }
       });
@@ -119,12 +152,39 @@ export function SamplePage() {
   const activeBank = getCachedSampleBank(sampleLayer.bankId);
 
   const handlePreload = () => {
-    if (!sampleLayer.bankId || !sampleLayer.presetId) {
+    if (!sampleLayer.bankId || !sampleLayer.presetId || !activePreset) {
       setMessage('Select a sample preset before preloading.');
       return;
     }
+
+    const requestId = sampleSelectionRequestId.current + 1;
+    sampleSelectionRequestId.current = requestId;
+    setSampleStatus('LOADING SAMPLE');
+    setMessage('Loading bank...');
     updateSampleLayer({ preload: true });
-    setMessage('Preload requested for the active sample preset.');
+    void presetWillUseFallbackForUi(sampleLayer.bankId, activePreset).then((usesFallback) => {
+      if (sampleSelectionRequestId.current !== requestId) {
+        return;
+      }
+      setSampleStatus(usesFallback ? 'FALLBACK SAMPLE' : 'READY');
+      setMessage(usesFallback ? 'Using fallback buffer' : 'Preset ready');
+    });
+  };
+
+  const handleSelectSamplePreset = async (item: BrowserSamplePreset) => {
+    const requestId = sampleSelectionRequestId.current + 1;
+    sampleSelectionRequestId.current = requestId;
+    setSampleStatus('LOADING SAMPLE');
+    setMessage('Loading bank...');
+    selectSamplePreset(item.bankId, item.preset.id);
+
+    const usesFallback = await presetWillUseFallbackForUi(item.bankId, item.preset);
+    if (sampleSelectionRequestId.current !== requestId) {
+      return;
+    }
+
+    setSampleStatus(usesFallback ? 'FALLBACK SAMPLE' : 'READY');
+    setMessage(usesFallback ? 'Using fallback buffer' : 'Preset ready');
   };
 
   return (
@@ -137,6 +197,8 @@ export function SamplePage() {
           <span className="workstation-tab">FILTER</span>
         </nav>
       </header>
+
+      <WorkstationBreadcrumb items={['SAMPLE', activeBank?.name ?? (selectedBankId === 'All' ? 'ALL BANKS' : selectedBankId), selectedFilter === 'All' ? 'All' : selectedFilter, activePreset?.name ?? 'No Sample']} />
 
       <div className="sample-page-layout">
         <aside className="workstation-side-buttons sample-page-sidebar" aria-label="Sample bank and category filters">
@@ -176,7 +238,7 @@ export function SamplePage() {
                 {visiblePresets.map((item) => {
                   const active = item.bankId === sampleLayer.bankId && item.preset.id === sampleLayer.presetId;
                   return (
-                    <button key={`${item.bankId}:${item.preset.id}`} type="button" className={active ? 'sample-page-row is-active' : 'sample-page-row'} onClick={() => selectSamplePreset(item.bankId, item.preset.id)}>
+                    <button key={`${item.bankId}:${item.preset.id}`} type="button" className={active ? 'sample-page-row is-active' : 'sample-page-row'} onClick={() => void handleSelectSamplePreset(item)}>
                       <span className="workstation-led-dot is-small" />
                       <span>
                         <strong>{item.preset.name}</strong>
@@ -238,14 +300,12 @@ export function SamplePage() {
             </div>
           </section>
 
-          {message ? <div className="sample-bank-error">{message}</div> : null}
+          {message ? <div className={sampleStatus === 'FALLBACK SAMPLE' ? 'sample-bank-message is-warning' : 'sample-bank-message'}>{message}</div> : null}
         </aside>
       </div>
 
-      <footer className="workstation-status-bar">
-        <span>{activePreset ? `${activePreset.name} loaded` : 'No sample loaded'}</span>
-        <strong>{sampleLayer.preload ? 'PRELOAD READY' : 'PRELOAD OFF'}</strong>
-      </footer>
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message={message ?? (activePreset ? `${activePreset.name} ready` : 'No sample loaded')} status={sampleStatus} />
     </div>
   );
 }

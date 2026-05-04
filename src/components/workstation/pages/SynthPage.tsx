@@ -3,6 +3,7 @@ import { useSynthStore } from '../../../store/synthStore';
 import { Knob } from '../../ui/Knob';
 import { LedButton } from '../../ui/LedButton';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 const waveforms: SynthWaveform[] = ['sine', 'square', 'sawtooth', 'triangle', 'pulse', 'wavetable'];
 const noiseKinds: NoiseKind[] = ['white', 'pink'];
@@ -85,6 +86,8 @@ export function SynthPage() {
         </nav>
       </header>
 
+      <WorkstationBreadcrumb items={['SYNTH', 'OSCILLATOR EDIT', 'OSC BASIC']} />
+
       <div className="workstation-page-grid workstation-osc-grid">
         <OscillatorEditBlock title="OSC A" osc={oscA} tone="cyan" onChange={updateOscA} />
         <OscillatorEditBlock title="OSC B" osc={oscB} tone="violet" onChange={updateOscB} />
@@ -118,6 +121,9 @@ export function SynthPage() {
           </div>
         </section>
       </div>
+
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message="Oscillator edit ready" status="READY" />
     </div>
   );
 }

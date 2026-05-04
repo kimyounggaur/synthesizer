@@ -2,6 +2,7 @@ import type { EnvelopeState, FilterKind } from '../../../types/synth';
 import { useSynthStore } from '../../../store/synthStore';
 import { Knob } from '../../ui/Knob';
 import { MiniDisplay } from '../../ui/MiniDisplay';
+import { WorkstationBreadcrumb, WorkstationSoftKeys, WorkstationStatusBar } from '../WorkstationLCDChrome';
 
 const filterTypes: FilterKind[] = ['lowpass', 'highpass', 'bandpass', 'notch', 'ladder'];
 const envelopeControls: Array<keyof EnvelopeState> = ['attack', 'decay', 'sustain', 'release'];
@@ -100,6 +101,8 @@ export function FilterAmpPage() {
         </nav>
       </header>
 
+      <WorkstationBreadcrumb items={['SYNTH', 'FILTER / AMP', filter.type.toUpperCase()]} />
+
       <div className="workstation-page-grid filter-amp-visual-grid">
         <section className="module-block module-block-amber workstation-card filter-amp-curve-card">
           <div className="workstation-card-header">
@@ -144,6 +147,9 @@ export function FilterAmpPage() {
         <EnvelopeKnobs title="AMP EG" env={ampEnv} tone="violet" onChange={(partial) => updateEnvelope('ampEnv', partial)} />
         <EnvelopeKnobs title="FILTER EG" env={filterEnv} tone="violet" onChange={(partial) => updateEnvelope('filterEnv', partial)} />
       </div>
+
+      <WorkstationSoftKeys />
+      <WorkstationStatusBar message={`Filter cutoff ${cutoffLabel}`} status="READY" />
     </div>
   );
 }

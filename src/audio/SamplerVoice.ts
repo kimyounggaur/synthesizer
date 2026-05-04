@@ -1,70 +1,77 @@
-import { EnvelopeModule } from './EnvelopeModule';
-import type { SampleLayerState, SamplePresetDefinition, SampleZone } from '../types/soundfont';
-import type { SynthEngineState } from '../types/synth';
-import { clamp, normalizeVelocity, semitoneRatio } from '../utils/audioMath';
+import type { SampleLayerState, SampleZone } from '../types/soundfont';
+import { clamp } from '../utils/audioMath';
 
-type SamplerVoiceEndedCallback = (voice: SamplerVoice) => void;
-
-interface SamplerVoiceOptions {
-  buffer: AudioBuffer;
-  preset: SamplePresetDefinition;
+export interface SamplerVoiceOptions {
+  context: AudioContext;
+  note: number;
+  velocity: number;
   zone: SampleZone;
+  buffer: AudioBuffer;
+  sampleLayer: SampleLayerState;
+  onEnded: (voice: SamplerVoice) => void;
 }
 
 export class SamplerVoice {
   readonly note: number;
 
   private readonly context: AudioContext;
-  private readonly velocity: number;
-  private readonly onEnded: SamplerVoiceEndedCallback;
+  private readonly sampleLayer: SampleLayerState;
+  private readonly onEnded: (voice: SamplerVoice) => void;
   private readonly source: AudioBufferSourceNode;
-  private readonly zoneGain: GainNode;
-  private readonly filter: BiquadFilterNode;
-  private readonly voiceGain: GainNode;
+  private readonly sourceGain: GainNode;
+  private readonly filter: BiquadFilterNode | null;
+  private readonly ampGain: GainNode;
   private readonly panner: StereoPannerNode;
-  private readonly ampEnvelope: EnvelopeModule;
-  private readonly zone: SampleZone;
+  private readonly targetGain: number;
+  private stopScheduled = false;
   private releaseTimer: number | null = null;
-  private state: SynthEngineState;
   private ended = false;
+  private disposed = false;
   private released = false;
+  private started = false;
 
-  constructor(context: AudioContext, note: number, velocity: number, state: SynthEngineState, options: SamplerVoiceOptions, onEnded: SamplerVoiceEndedCallback) {
-    this.context = context;
-    this.note = note;
-    this.velocity = normalizeVelocity(velocity);
-    this.state = state;
-    this.zone = options.zone;
-    this.onEnded = onEnded;
+  constructor(options: SamplerVoiceOptions) {
+    this.context = options.context;
+    this.note = options.note;
+    this.sampleLayer = options.sampleLayer;
+    this.onEnded = options.onEnded;
 
-    this.source = context.createBufferSource();
-    this.zoneGain = context.createGain();
-    this.filter = context.createBiquadFilter();
-    this.voiceGain = context.createGain();
-    this.panner = context.createStereoPanner();
-    this.ampEnvelope = new EnvelopeModule(context, this.voiceGain.gain);
+    const velocityGain = Math.max(0.05, Math.min(1, options.velocity));
+    this.targetGain = clamp(options.sampleLayer.level, 0, 1.5) * velocityGain * (options.zone.gain ?? 1);
 
+    this.source = options.context.createBufferSource();
+    this.sourceGain = options.context.createGain();
+    this.filter = options.sampleLayer.filterEnabled ? options.context.createBiquadFilter() : null;
+    this.ampGain = options.context.createGain();
+    this.panner = options.context.createStereoPanner();
+
+    const semitoneOffset = options.note - options.zone.rootNote;
     this.source.buffer = options.buffer;
-    this.source.playbackRate.value = semitoneRatio(note - options.zone.rootNote);
-    this.source.loop = Boolean(options.zone.loop && !state.sampleLayer.oneShot);
-    if (this.source.loop && options.zone.loopStart !== undefined) {
-      this.source.loopStart = clamp(options.zone.loopStart, 0, options.buffer.duration);
-    }
-    if (this.source.loop && options.zone.loopEnd !== undefined) {
-      this.source.loopEnd = clamp(options.zone.loopEnd, this.source.loopStart, options.buffer.duration);
+    this.source.playbackRate.value = Math.pow(2, semitoneOffset / 12);
+    this.source.loop = Boolean(options.zone.loop && !options.sampleLayer.oneShot);
+    if (this.source.loop) {
+      this.source.loopStart = clamp(options.zone.loopStart ?? 0, 0, options.buffer.duration);
+      this.source.loopEnd = clamp(options.zone.loopEnd ?? options.buffer.duration, this.source.loopStart, options.buffer.duration);
     }
 
     this.source.onended = () => this.finish();
-    this.zoneGain.gain.value = options.zone.gain ?? 1;
-    this.filter.type = 'lowpass';
-    this.voiceGain.gain.value = 0.0001;
+    this.sourceGain.gain.value = 1;
+    this.ampGain.gain.value = 0.0001;
     this.panner.pan.value = clamp(options.zone.pan ?? 0, -1, 1);
 
-    this.source.connect(this.zoneGain);
-    this.zoneGain.connect(this.filter);
-    this.filter.connect(this.voiceGain);
-    this.voiceGain.connect(this.panner);
-    this.updateState(state);
+    if (this.filter) {
+      this.filter.type = 'lowpass';
+      this.filter.frequency.value = clamp(options.sampleLayer.filterCutoff, 24, 20000);
+      this.filter.Q.value = clamp(options.sampleLayer.filterResonance, 0.1, 24);
+      this.source.connect(this.sourceGain);
+      this.sourceGain.connect(this.filter);
+      this.filter.connect(this.ampGain);
+    } else {
+      this.source.connect(this.sourceGain);
+      this.sourceGain.connect(this.ampGain);
+    }
+
+    this.ampGain.connect(this.panner);
   }
 
   connect(destination: AudioNode): void {
@@ -72,61 +79,85 @@ export class SamplerVoice {
   }
 
   start(when = this.context.currentTime): void {
-    const layer = this.state.sampleLayer;
+    if (this.started || this.ended) {
+      return;
+    }
+
+    this.started = true;
+    const attack = Math.max(0.001, this.sampleLayer.attack);
+    const decay = Math.max(0.001, this.sampleLayer.decay);
+    const sustain = clamp(this.sampleLayer.sustain, 0, 1);
+
+    this.ampGain.gain.cancelScheduledValues(when);
+    this.ampGain.gain.setValueAtTime(0.0001, when);
+    this.ampGain.gain.linearRampToValueAtTime(Math.max(0.0001, this.targetGain), when + attack);
+    this.ampGain.gain.linearRampToValueAtTime(Math.max(0.0001, this.targetGain * sustain), when + attack + decay);
     this.source.start(when);
-    this.ampEnvelope.triggerAttack(this.toEnvelope(layer), this.velocity * clamp(layer.level, 0, 1.5), when);
   }
 
   noteOff(when = this.context.currentTime): void {
-    if (this.released || (this.state.sampleLayer.oneShot && !this.source.loop)) {
+    if (this.released || this.ended || (this.sampleLayer.oneShot && !this.source.loop)) {
       return;
     }
 
     this.released = true;
-    const endAt = this.ampEnvelope.triggerRelease(this.toEnvelope(this.state.sampleLayer), when);
-    try {
-      this.source.stop(endAt + 0.05);
-    } catch {
-      // BufferSource throws if stop was already scheduled.
-    }
-
-    this.releaseTimer = window.setTimeout(() => this.finish(), Math.max(20, (endAt - this.context.currentTime + 0.12) * 1000));
+    const release = Math.max(0.001, this.sampleLayer.release);
+    this.ampGain.gain.cancelScheduledValues(when);
+    this.ampGain.gain.setTargetAtTime(0.0001, when, Math.max(0.01, release / 3));
+    this.stopSource(when + release + 0.05);
+    this.releaseTimer = window.setTimeout(() => this.finish(), Math.max(30, (release + 0.12) * 1000));
   }
 
   stopImmediately(): void {
+    if (this.ended) {
+      return;
+    }
+
     if (this.releaseTimer !== null) {
       window.clearTimeout(this.releaseTimer);
       this.releaseTimer = null;
     }
 
     const now = this.context.currentTime;
-    this.voiceGain.gain.cancelScheduledValues(now);
-    this.voiceGain.gain.setTargetAtTime(0.0001, now, 0.01);
-    try {
-      this.source.stop(now + 0.03);
-    } catch {
-      // No-op if already stopped.
-    }
-
+    const stopAt = now + 0.03;
+    this.ampGain.gain.cancelScheduledValues(now);
+    this.ampGain.gain.setTargetAtTime(0.0001, now, 0.01);
+    this.stopSource(stopAt);
     this.releaseTimer = window.setTimeout(() => this.finish(), 70);
   }
 
-  updateState(state: SynthEngineState): void {
-    this.state = state;
-    const layer = state.sampleLayer;
-    const now = this.context.currentTime;
-    this.filter.frequency.setTargetAtTime(layer.filterEnabled ? clamp(layer.filterCutoff, 24, 20000) : 20000, now, 0.02);
-    this.filter.Q.setTargetAtTime(layer.filterEnabled ? clamp(layer.filterResonance, 0.1, 24) : 0.1, now, 0.02);
-    this.panner.pan.setTargetAtTime(clamp(this.zone.pan ?? 0, -1, 1), now, 0.02);
+  dispose(): void {
+    if (this.disposed) {
+      return;
+    }
+
+    this.disposed = true;
+    if (this.releaseTimer !== null) {
+      window.clearTimeout(this.releaseTimer);
+      this.releaseTimer = null;
+    }
+
+    this.source.onended = null;
+    this.disconnectNode(this.source);
+    this.disconnectNode(this.sourceGain);
+    if (this.filter) {
+      this.disconnectNode(this.filter);
+    }
+    this.disconnectNode(this.ampGain);
+    this.disconnectNode(this.panner);
   }
 
-  private toEnvelope(layer: SampleLayerState) {
-    return {
-      attack: layer.attack,
-      decay: layer.decay,
-      sustain: layer.sustain,
-      release: layer.release,
-    };
+  private stopSource(when: number): void {
+    if (this.stopScheduled) {
+      return;
+    }
+
+    this.stopScheduled = true;
+    try {
+      this.source.stop(when);
+    } catch {
+      // BufferSource throws if stop was already called or the source never started.
+    }
   }
 
   private finish(): void {
@@ -135,19 +166,15 @@ export class SamplerVoice {
     }
 
     this.ended = true;
-    if (this.releaseTimer !== null) {
-      window.clearTimeout(this.releaseTimer);
-      this.releaseTimer = null;
-    }
     this.dispose();
     this.onEnded(this);
   }
 
-  private dispose(): void {
-    this.source.disconnect();
-    this.zoneGain.disconnect();
-    this.filter.disconnect();
-    this.voiceGain.disconnect();
-    this.panner.disconnect();
+  private disconnectNode(node: AudioNode): void {
+    try {
+      node.disconnect();
+    } catch {
+      // Disconnect may throw if the node was already detached.
+    }
   }
 }

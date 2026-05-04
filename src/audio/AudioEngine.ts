@@ -11,6 +11,10 @@ type WindowWithWebkitAudio = Window & typeof globalThis & {
 
 type EngineVoice = Voice | SamplerVoice;
 
+function isSynthVoice(voice: EngineVoice): voice is Voice {
+  return voice instanceof Voice;
+}
+
 export class AudioEngine {
   private readonly context: AudioContext;
   private readonly masterGain: GainNode;
@@ -67,7 +71,11 @@ export class AudioEngine {
     this.maxPolyphony = state.polyphony;
     this.setMasterVolume(state.masterVolume);
     this.effectsChain?.update(state.effects);
-    this.voices.forEach((voiceStack) => voiceStack.forEach((voice) => voice.updateState(state)));
+    this.voices.forEach((voiceStack) => voiceStack.forEach((voice) => {
+      if (isSynthVoice(voice)) {
+        voice.updateState(state);
+      }
+    }));
     const sampleKey = `${state.sampleLayer.bankId ?? ''}:${state.sampleLayer.presetId ?? ''}`;
     if (state.sampleLayer.enabled && state.sampleLayer.preload && state.sampleLayer.bankId && state.sampleLayer.presetId && sampleKey !== this.preloadedSampleKey) {
       this.preloadedSampleKey = sampleKey;
@@ -200,7 +208,17 @@ export class AudioEngine {
         const zone = preset ? this.sampleBankManager.findZone(preset, note, velocity) : null;
         if (preset && zone) {
           const buffer = await this.sampleBankManager.getBufferForZone(bankId, zone);
-          voiceStack.push(new SamplerVoice(this.context, note, velocity, this.state, { buffer, preset, zone }, (endedVoice) => this.removeVoice(endedVoice)));
+          voiceStack.push(
+            new SamplerVoice({
+              context: this.context,
+              note,
+              velocity,
+              zone,
+              buffer,
+              sampleLayer: this.state.sampleLayer,
+              onEnded: (endedVoice) => this.removeVoice(endedVoice),
+            }),
+          );
         }
       }
     }

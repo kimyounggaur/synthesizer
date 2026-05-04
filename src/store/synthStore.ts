@@ -173,7 +173,7 @@ export interface SynthStore extends SynthEngineState {
   reorderWaveSteps: (from: number, to: number) => void;
   updateVectorPosition: (partial: Partial<VectorMixerState>) => void;
   updateSampleLayer: (partial: Partial<SampleLayerState>) => void;
-  loadSamplePreset: (bankId: string, presetId: string) => void;
+  selectSamplePreset: (bankId: string, presetId: string) => void;
   addEffect: (effect: EffectState) => void;
   updateEffect: (id: string, partial: Partial<EffectState>) => void;
   removeEffect: (id: string) => void;
@@ -230,9 +230,9 @@ export const useSynthStore = create<SynthStore>((set) => ({
     })),
   updateVectorPosition: (partial) => set((state) => ({ vectorMixer: { ...state.vectorMixer, ...partial } })),
   updateSampleLayer: (partial) => set((state) => ({ sampleLayer: { ...state.sampleLayer, ...partial } })),
-  loadSamplePreset: (bankId, presetId) =>
+  selectSamplePreset: (bankId, presetId) =>
     set((state) => ({
-      engineMode: state.engineMode === 'hybrid' ? 'hybrid' : 'sample',
+      engineMode: 'sample',
       sampleLayer: {
         ...state.sampleLayer,
         enabled: true,

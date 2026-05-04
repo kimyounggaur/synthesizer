@@ -53,7 +53,7 @@ export function SamplePresetBrowser() {
   const sampleLayer = useSynthStore((state) => state.sampleLayer);
   const setEngineMode = useSynthStore((state) => state.setEngineMode);
   const updateSampleLayer = useSynthStore((state) => state.updateSampleLayer);
-  const loadSamplePreset = useSynthStore((state) => state.loadSamplePreset);
+  const selectSamplePreset = useSynthStore((state) => state.selectSamplePreset);
 
   useEffect(() => {
     let mounted = true;
@@ -189,7 +189,7 @@ export function SamplePresetBrowser() {
                 const active = item.bankId === sampleLayer.bankId && item.preset.id === sampleLayer.presetId;
                 return (
                   <div key={`${item.bankId}:${item.preset.id}`} className={active ? 'sample-preset-row is-active' : 'sample-preset-row'}>
-                    <button className="sample-preset-load" onClick={() => loadSamplePreset(item.bankId, item.preset.id)}>
+                    <button className="sample-preset-load" onClick={() => selectSamplePreset(item.bankId, item.preset.id)}>
                       <span className="sample-preset-name">{item.preset.name}</span>
                       <span className="sample-preset-meta">
                         {item.preset.category} / {item.bankName}

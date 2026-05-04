@@ -1048,8 +1048,13 @@
 
   .keyboard-key {
     --key-velocity: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
     flex: 1 1 0;
     min-width: 1.22rem;
+    padding-top: 0.35rem;
     touch-action: none;
     user-select: none;
     border-radius: 0 0 6px 6px;
@@ -1066,6 +1071,23 @@
     flex-grow: 0.7;
     height: 7rem;
     min-width: 1rem;
+  }
+
+  .keyboard-shortcut-label {
+    max-width: 100%;
+    overflow: hidden;
+    border-radius: 3px;
+    color: rgba(94, 232, 255, 0.98);
+    font-size: 0.52rem;
+    font-weight: 900;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-shadow: 0 0 8px rgba(94, 232, 255, 0.55);
+    white-space: nowrap;
+  }
+
+  .keyboard-note-label {
+    line-height: 1;
   }
 
   .keyboard-key:active,

@@ -8,21 +8,84 @@ interface KeyboardProps {
 
 const chromaticNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const visibleKeyCount = 61;
-const computerMap = new Map<string, number>([
-  ['a', 0],
-  ['w', 1],
-  ['s', 2],
-  ['e', 3],
-  ['d', 4],
-  ['f', 5],
-  ['t', 6],
-  ['g', 7],
-  ['y', 8],
-  ['h', 9],
-  ['u', 10],
-  ['j', 11],
-  ['k', 12],
-]);
+
+const computerKeyboardRows = [
+  [
+    ['Backquote', '`'],
+    ['Digit1', '1'],
+    ['Digit2', '2'],
+    ['Digit3', '3'],
+    ['Digit4', '4'],
+    ['Digit5', '5'],
+    ['Digit6', '6'],
+    ['Digit7', '7'],
+    ['Digit8', '8'],
+    ['Digit9', '9'],
+    ['Digit0', '0'],
+    ['Minus', '-'],
+    ['Equal', '='],
+  ],
+  [
+    ['KeyQ', 'Q'],
+    ['KeyW', 'W'],
+    ['KeyE', 'E'],
+    ['KeyR', 'R'],
+    ['KeyT', 'T'],
+    ['KeyY', 'Y'],
+    ['KeyU', 'U'],
+    ['KeyI', 'I'],
+    ['KeyO', 'O'],
+    ['KeyP', 'P'],
+    ['BracketLeft', '['],
+    ['BracketRight', ']'],
+    ['Backslash', '\\'],
+  ],
+  [
+    ['KeyA', 'A'],
+    ['KeyS', 'S'],
+    ['KeyD', 'D'],
+    ['KeyF', 'F'],
+    ['KeyG', 'G'],
+    ['KeyH', 'H'],
+    ['KeyJ', 'J'],
+    ['KeyK', 'K'],
+    ['KeyL', 'L'],
+    ['Semicolon', ';'],
+    ['Quote', "'"],
+  ],
+  [
+    ['KeyZ', 'Z'],
+    ['KeyX', 'X'],
+    ['KeyC', 'C'],
+    ['KeyV', 'V'],
+    ['KeyB', 'B'],
+    ['KeyN', 'N'],
+    ['KeyM', 'M'],
+    ['Comma', ','],
+    ['Period', '.'],
+    ['Slash', '/'],
+  ],
+  [
+    ['NumpadDivide', 'N/'],
+    ['NumpadMultiply', 'N*'],
+    ['NumpadSubtract', 'N-'],
+    ['Numpad7', 'N7'],
+    ['Numpad8', 'N8'],
+    ['Numpad9', 'N9'],
+    ['NumpadAdd', 'N+'],
+    ['Numpad4', 'N4'],
+    ['Numpad5', 'N5'],
+    ['Numpad6', 'N6'],
+    ['Numpad1', 'N1'],
+    ['Numpad2', 'N2'],
+    ['Numpad3', 'N3'],
+    ['Numpad0', 'N0'],
+  ],
+] as const;
+
+const computerKeys = computerKeyboardRows.flat().slice(0, visibleKeyCount);
+const computerMap = new Map<string, number>(computerKeys.map(([code], offset) => [code, offset]));
+const computerKeyLabels = new Map<number, string>(computerKeys.map(([, label], offset) => [offset, label]));
 
 function isBlack(note: number): boolean {
   return [1, 3, 6, 8, 10].includes(note % 12);
@@ -31,6 +94,14 @@ function isBlack(note: number): boolean {
 function noteName(note: number): string {
   const octave = Math.floor(note / 12) - 1;
   return `${chromaticNames[note % 12]}${octave}`;
+}
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+
+  return target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName);
 }
 
 export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
@@ -48,17 +119,23 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      const key = event.key.toLowerCase();
+      if (isEditableTarget(event.target)) {
+        return;
+      }
+
+      const key = event.code;
       if (event.repeat) {
         return;
       }
 
-      if (key === 'z') {
+      if (key === 'PageDown') {
+        event.preventDefault();
         setKeyboardOctave(keyboardOctave - 1);
         return;
       }
 
-      if (key === 'x') {
+      if (key === 'PageUp') {
+        event.preventDefault();
         setKeyboardOctave(keyboardOctave + 1);
         return;
       }
@@ -68,17 +145,19 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
         return;
       }
 
+      event.preventDefault();
       const note = (keyboardOctave + 1) * 12 + offset;
       heldKeys.current.set(key, note);
       onNoteOn(note, defaultVelocity);
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
-      const key = event.key.toLowerCase();
+      const key = event.code;
       const note = heldKeys.current.get(key);
       if (note === undefined) {
         return;
       }
+      event.preventDefault();
       heldKeys.current.delete(key);
       onNoteOff(note);
     };
@@ -124,10 +203,11 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
           const black = isBlack(note);
           const active = activeNotes[note] !== undefined;
           const velocity = activeNotes[note] ?? 0;
+          const keyLabel = computerKeyLabels.get(note - (keyboardOctave + 1) * 12);
           return (
             <button
               key={note}
-              className={`keyboard-key ${black ? 'is-black' : 'is-white'} ${active ? 'is-active' : ''} relative flex items-end justify-center px-1 pb-3 font-mono text-[0.68rem] ${
+              className={`keyboard-key ${black ? 'is-black' : 'is-white'} ${active ? 'is-active' : ''} relative px-1 pb-3 font-mono text-[0.68rem] ${
                 black
                   ? 'bg-slate-950 text-slate-400 shadow-inner'
                   : 'bg-slate-200 text-slate-950'
@@ -150,7 +230,8 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
                 }
               }}
             >
-              {noteName(note)}
+              <span className="keyboard-shortcut-label">{keyLabel}</span>
+              <span className="keyboard-note-label">{noteName(note)}</span>
             </button>
           );
         })}

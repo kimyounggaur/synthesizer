@@ -7,14 +7,14 @@ export interface WorkstationPageDefinition {
 }
 
 export const workstationPages: WorkstationPageDefinition[] = [
-  { id: 'program', label: 'Set List', detail: 'Program bank' },
-  { id: 'sample', label: 'Sample', detail: 'Layer bank' },
-  { id: 'synth', label: 'Tone Edit', detail: 'Osc / mix' },
-  { id: 'filterAmp', label: 'Filter/Amp', detail: 'EG / VCF' },
-  { id: 'modulation', label: 'Control', detail: 'LFO routing' },
-  { id: 'waveVector', label: 'Wave Seq', detail: 'Vector lane' },
-  { id: 'effects', label: 'IFX / MFX', detail: 'FX chain' },
-  { id: 'global', label: 'Global', detail: 'System' },
+  { id: 'program', label: 'Program', detail: '' },
+  { id: 'sample', label: 'Sample', detail: '' },
+  { id: 'synth', label: 'Hybrid', detail: '' },
+  { id: 'waveVector', label: 'Seq', detail: '' },
+  { id: 'global', label: 'Global', detail: '' },
+  { id: 'effects', label: 'Utility', detail: '' },
+  { id: 'filterAmp', label: 'Browser', detail: '' },
+  { id: 'modulation', label: 'Exit', detail: '' },
 ];
 
 export function workstationPagePanelId(pageId: WorkstationPageId): string {

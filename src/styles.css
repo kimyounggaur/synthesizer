@@ -5064,4 +5064,823 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
+
+  .nautilus-inspired-top {
+    display: grid;
+    grid-template-columns: minmax(360px, 0.92fr) minmax(560px, 1.18fr) minmax(360px, 0.92fr);
+    gap: 0.7rem;
+    align-items: stretch;
+    min-height: 13.8rem;
+    padding: 0.7rem;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.018)),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.3), transparent 28%, transparent 68%, rgba(0, 0, 0, 0.34)),
+      #15191f;
+  }
+
+  .nautilus-left-controls,
+  .nautilus-right-controls {
+    min-width: 0;
+    border: 1px solid rgba(188, 197, 206, 0.18);
+    border-radius: 7px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.18)),
+      #101419;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.68);
+  }
+
+  .nautilus-left-controls {
+    display: grid;
+    grid-template-columns: 3.4rem minmax(180px, 0.82fr) minmax(260px, 1.18fr);
+    grid-template-areas:
+      "fader brand knobs"
+      "fader util util";
+    gap: 0.72rem;
+    padding: 0.72rem;
+  }
+
+  .nautilus-master-fader {
+    grid-area: fader;
+    display: grid;
+    grid-template-rows: auto minmax(6.5rem, 1fr) auto;
+    justify-items: center;
+    gap: 0.45rem;
+    min-width: 0;
+    color: #e8eef1;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .nautilus-master-fader input {
+    width: 2rem;
+    min-height: 7.5rem;
+    accent-color: #dce1e9;
+    direction: rtl;
+    writing-mode: vertical-lr;
+  }
+
+  .nautilus-master-fader strong {
+    color: var(--ws-lcd-text);
+    font-size: 0.68rem;
+  }
+
+  .nautilus-brand-readout {
+    grid-area: brand;
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.7rem;
+    border: 1px solid rgba(81, 245, 198, 0.24);
+    border-radius: 6px;
+    background:
+      linear-gradient(180deg, rgba(81, 245, 198, 0.08), rgba(0, 0, 0, 0.12)),
+      #080d10;
+    padding: 0.65rem;
+  }
+
+  .nautilus-brand-readout .brand-mark {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(81, 245, 198, 0.44);
+    border-radius: 6px;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(81, 245, 198, 0.24), transparent 48%),
+      #07120f;
+    color: var(--ws-lcd-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-weight: 900;
+  }
+
+  .nautilus-brand-readout .brand-name,
+  .nautilus-brand-readout .brand-subtitle {
+    color: #f4fbfd;
+    font-size: 1rem;
+    font-weight: 950;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .nautilus-brand-readout small {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--ws-lcd-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+  }
+
+  .nautilus-knob-bank {
+    grid-area: knobs;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.46rem;
+    align-items: start;
+    min-width: 0;
+  }
+
+  .nautilus-panel-knob {
+    display: grid;
+    justify-items: center;
+    gap: 0.22rem;
+    min-width: 0;
+    color: #dbe4e6;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .nautilus-panel-knob span {
+    color: #c6ccd2;
+    font-size: 0.7rem;
+    font-weight: 900;
+  }
+
+  .nautilus-panel-knob i {
+    position: relative;
+    display: block;
+    width: clamp(2rem, 4.2vw, 3rem);
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 38% 32%, rgba(255, 255, 255, 0.22), transparent 18%),
+      radial-gradient(circle at 50% 58%, #343b42 0 44%, #171b20 45% 100%);
+    box-shadow:
+      0 0.28rem 0.72rem rgba(0, 0, 0, 0.55),
+      inset 0 1px 1px rgba(255, 255, 255, 0.16);
+  }
+
+  .nautilus-panel-knob i::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 15%;
+    width: 0.14rem;
+    height: 37%;
+    border-radius: 999px;
+    background: #eef4fa;
+    transform: translateX(-50%);
+    box-shadow: 0 0 7px rgba(255, 255, 255, 0.42);
+  }
+
+  .nautilus-panel-knob strong {
+    max-width: 100%;
+    overflow: hidden;
+    color: #cfd9dd;
+    font-size: 0.58rem;
+    font-weight: 900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nautilus-utility-buttons {
+    grid-area: util;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.44rem;
+    align-items: end;
+    min-width: 0;
+  }
+
+  .nautilus-mini-button,
+  .engine-mode-button {
+    min-width: 0;
+    min-height: 2rem;
+    border: 1px solid rgba(222, 229, 240, 0.28);
+    border-radius: 4px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.13), rgba(0, 0, 0, 0.24)),
+      #171c22;
+    color: #eef6f7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 0.36rem 0.42rem;
+    text-transform: uppercase;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.72);
+  }
+
+  .nautilus-mini-button:hover,
+  .engine-mode-button:hover,
+  .nautilus-mini-button:focus-visible,
+  .engine-mode-button:focus-visible {
+    border-color: rgba(185, 255, 232, 0.58);
+    color: #ffffff;
+  }
+
+  .nautilus-mini-button.is-danger,
+  .nautilus-panic-button {
+    border-color: rgba(66, 198, 255, 0.7);
+    color: #ffffff;
+    box-shadow:
+      0 0 14px rgba(66, 198, 255, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+
+  .nautilus-touchview {
+    position: relative;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 0.38rem;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.82);
+    border-radius: 7px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 12%, rgba(0, 0, 0, 0.28) 88%),
+      #030405;
+    padding: 0.54rem;
+    box-shadow:
+      inset 0 0 0 0.34rem rgba(36, 41, 47, 0.86),
+      inset 0 0 0 0.43rem rgba(0, 0, 0, 0.78),
+      0 0.4rem 1.1rem rgba(0, 0, 0, 0.45);
+  }
+
+  .nautilus-touchview::after {
+    content: "";
+    position: absolute;
+    inset: 0.54rem;
+    pointer-events: none;
+    background:
+      repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 30%);
+    opacity: 0.3;
+  }
+
+  .nautilus-touchview > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .nautilus-touchview-top,
+  .nautilus-touchview-footer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 0.45rem;
+    align-items: center;
+    color: #dbe7e9;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .nautilus-touchview-top strong,
+  .nautilus-touchview-top em {
+    border: 1px solid rgba(185, 255, 232, 0.22);
+    border-radius: 3px;
+    background: rgba(185, 255, 232, 0.08);
+    color: var(--ws-lcd-text);
+    font-style: normal;
+    padding: 0.18rem 0.38rem;
+  }
+
+  .nautilus-current-program {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.5rem;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.38rem 0;
+  }
+
+  .nautilus-current-program > span {
+    color: var(--ws-amber);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+  }
+
+  .nautilus-current-program h2,
+  .nautilus-current-program p {
+    min-width: 0;
+    overflow: hidden;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .nautilus-current-program h2 {
+    color: #f6f9fb;
+    font-size: 1rem;
+    font-weight: 950;
+  }
+
+  .nautilus-current-program p {
+    color: #aab6bb;
+    font-size: 0.67rem;
+    font-weight: 800;
+  }
+
+  .nautilus-setlist-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.32rem;
+    min-height: 0;
+    overflow: auto;
+    padding-right: 0.1rem;
+  }
+
+  .nautilus-setlist-slot {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    gap: 0.08rem 0.38rem;
+    align-content: start;
+    min-width: 0;
+    min-height: 3.1rem;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 2px;
+    background: #17191e;
+    color: #f1f6f7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    padding: 0.36rem;
+    text-align: left;
+  }
+
+  .nautilus-setlist-slot:nth-child(4n + 1) {
+    background: linear-gradient(180deg, rgba(141, 35, 47, 0.94), rgba(74, 23, 30, 0.94));
+  }
+
+  .nautilus-setlist-slot:nth-child(4n + 2) {
+    background: linear-gradient(180deg, rgba(190, 93, 35, 0.94), rgba(101, 50, 22, 0.94));
+  }
+
+  .nautilus-setlist-slot:nth-child(4n + 3) {
+    background: linear-gradient(180deg, rgba(76, 88, 156, 0.94), rgba(38, 45, 94, 0.94));
+  }
+
+  .nautilus-setlist-slot:nth-child(4n) {
+    background: linear-gradient(180deg, rgba(169, 130, 43, 0.94), rgba(84, 67, 25, 0.94));
+  }
+
+  .nautilus-setlist-slot.is-active {
+    border-color: rgba(255, 255, 255, 0.82);
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.72),
+      0 0 0 2px rgba(185, 255, 232, 0.28);
+  }
+
+  .nautilus-setlist-slot span,
+  .nautilus-setlist-slot em {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.57rem;
+    font-style: normal;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .nautilus-setlist-slot strong {
+    min-width: 0;
+    overflow: hidden;
+    font-size: 0.67rem;
+    font-weight: 950;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .nautilus-setlist-slot em {
+    grid-column: 2;
+  }
+
+  .nautilus-touchview-footer {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .nautilus-touchview-footer button {
+    min-height: 1.5rem;
+    border: 1px solid rgba(188, 197, 206, 0.2);
+    border-radius: 2px;
+    background: #11161b;
+    color: #e8edf0;
+    font: inherit;
+    font-size: 0.58rem;
+    text-transform: uppercase;
+  }
+
+  .nautilus-right-controls {
+    display: grid;
+    grid-template-columns: minmax(132px, 0.72fr) minmax(170px, 1fr);
+    grid-template-areas:
+      "encoder quick"
+      "system quick"
+      "mode meter";
+    gap: 0.58rem;
+    padding: 0.72rem;
+  }
+
+  .nautilus-encoder-area {
+    grid-area: encoder;
+    display: grid;
+    justify-items: center;
+    gap: 0.42rem;
+  }
+
+  .nautilus-encoder {
+    width: clamp(4.6rem, 7vw, 5.6rem);
+    aspect-ratio: 1;
+    border: 0.62rem solid #242a31;
+    border-radius: 999px;
+    background:
+      radial-gradient(circle at 38% 30%, rgba(255, 255, 255, 0.18), transparent 24%),
+      radial-gradient(circle, #31373e 0 58%, #14181d 59% 100%);
+    box-shadow:
+      0 0.45rem 1rem rgba(0, 0, 0, 0.52),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
+  }
+
+  .nautilus-inc-dec,
+  .nautilus-enter-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.28rem;
+    width: min(8rem, 100%);
+  }
+
+  .nautilus-inc-dec button,
+  .nautilus-enter-row button {
+    min-height: 1.55rem;
+    border: 1px solid rgba(188, 197, 206, 0.26);
+    border-radius: 3px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(0, 0, 0, 0.2)),
+      #1b2027;
+    color: #eef6f7;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.7rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .nautilus-quick-access {
+    grid-area: quick;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.52rem;
+    align-content: center;
+    min-width: 0;
+  }
+
+  .nautilus-quick-access .nautilus-mini-button:first-child,
+  .nautilus-quick-access .nautilus-mini-button:nth-child(2) {
+    grid-column: span 1;
+  }
+
+  .nautilus-system-strip {
+    grid-area: system;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .nautilus-system-strip label {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+    color: #b8c2c7;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .nautilus-system-strip .panel-input {
+    min-height: 2rem;
+    border-color: rgba(226, 179, 222, 0.42);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(93, 55, 93, 0.18)),
+      #d3a6ca;
+    color: #281f30;
+    font-weight: 950;
+  }
+
+  .nautilus-panic-button {
+    grid-column: 1 / -1;
+    min-height: 2.12rem;
+    border-radius: 5px;
+    background:
+      radial-gradient(circle at 18% 50%, rgba(81, 245, 198, 0.75) 0 0.28rem, transparent 0.3rem),
+      linear-gradient(180deg, rgba(66, 198, 255, 0.18), rgba(0, 0, 0, 0.2)),
+      #102532;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.8rem;
+    font-weight: 950;
+    padding-left: 1.2rem;
+    text-transform: uppercase;
+  }
+
+  .workstation-engine-mode-strip {
+    grid-area: mode;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.36rem;
+    min-width: 0;
+  }
+
+  .engine-mode-button.is-active,
+  .engine-mode-button[aria-pressed="true"] {
+    border-color: rgba(81, 245, 198, 0.76);
+    background:
+      linear-gradient(180deg, rgba(81, 245, 198, 0.22), rgba(0, 0, 0, 0.08)),
+      #0a2b23;
+    color: #f2fffb;
+  }
+
+  .nautilus-meter-wrap {
+    grid-area: meter;
+    min-width: 0;
+  }
+
+  .workstation-side-title {
+    color: var(--ws-lcd-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .workstation-button-led {
+    width: 0.48rem;
+    aspect-ratio: 1;
+    border: 1px solid rgba(188, 197, 206, 0.18);
+    border-radius: 999px;
+    background: #101419;
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.12),
+      0 0 0.28rem rgba(0, 0, 0, 0.8);
+  }
+
+  .workstation-side-button.is-active .workstation-button-led,
+  .workstation-side-button[aria-selected="true"] .workstation-button-led {
+    border-color: rgba(185, 255, 232, 0.72);
+    background: var(--ws-cyan);
+    box-shadow: 0 0 0.62rem rgba(81, 245, 198, 0.76);
+  }
+
+  .touch-lcd-title {
+    display: grid;
+    gap: 0.16rem;
+    min-width: 0;
+    color: var(--ws-lcd-text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    text-transform: uppercase;
+  }
+
+  .touch-lcd-title span {
+    color: var(--ws-lcd-dim);
+    font-size: 0.64rem;
+    font-weight: 900;
+  }
+
+  .touch-lcd-title h2,
+  .touch-lcd-title p {
+    min-width: 0;
+    overflow: hidden;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .touch-lcd-title h2 {
+    color: #e9fffb;
+    font-size: 1.35rem;
+    font-weight: 950;
+  }
+
+  .touch-lcd-title p {
+    color: #93d9c8;
+    font-size: 0.74rem;
+    font-weight: 800;
+  }
+
+  .program-page .workstation-page-header {
+    border-bottom: 1px solid rgba(81, 245, 198, 0.18);
+    padding-bottom: 0.7rem;
+  }
+
+  .program-page .workstation-tab {
+    min-width: 7.2rem;
+    min-height: 2.22rem;
+    border-color: rgba(188, 197, 206, 0.24);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0.24)),
+      #1a2027;
+    color: #b9c7c9;
+  }
+
+  .program-page .workstation-tab.is-active {
+    border-color: rgba(185, 255, 232, 0.68);
+    background:
+      linear-gradient(180deg, rgba(81, 245, 198, 0.22), rgba(0, 0, 0, 0.18)),
+      #173a31;
+    color: #eafff9;
+  }
+
+  .program-lcd-screen {
+    background:
+      repeating-linear-gradient(180deg, rgba(185, 255, 232, 0.04) 0 1px, transparent 1px 4px),
+      #020807;
+  }
+
+  .program-row {
+    border-color: rgba(81, 245, 198, 0.15);
+    background: rgba(3, 13, 11, 0.82);
+  }
+
+  .program-row.is-active {
+    border-color: rgba(185, 255, 232, 0.58);
+    background:
+      linear-gradient(90deg, rgba(81, 245, 198, 0.22), rgba(81, 245, 198, 0.06)),
+      rgba(5, 31, 25, 0.95);
+  }
+
+  .nautilus-parameter-rack {
+    grid-template-columns: 1fr;
+    border: 1px solid rgba(188, 197, 206, 0.18);
+    border-radius: 7px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(0, 0, 0, 0.18)),
+      #11161c;
+    padding: 0.64rem;
+  }
+
+  .nautilus-rack-header {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    border-bottom: 1px solid rgba(188, 197, 206, 0.16);
+    color: #a8b6ba;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding-bottom: 0.48rem;
+    text-transform: uppercase;
+  }
+
+  .nautilus-rack-header strong {
+    color: var(--ws-lcd-text);
+  }
+
+  .nautilus-rack-panel {
+    display: grid;
+    gap: 0.64rem;
+    min-width: 0;
+    border: 1px solid rgba(0, 0, 0, 0.46);
+    border-radius: 6px;
+    background: #0b0f14;
+    padding: 0.65rem;
+  }
+
+  .nautilus-rack-lcd {
+    display: grid;
+    gap: 0.16rem;
+    min-width: 0;
+    border: 1px solid rgba(81, 245, 198, 0.16);
+    border-radius: 4px;
+    background: rgba(7, 18, 15, 0.82);
+    color: var(--ws-lcd-dim);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 0.45rem;
+    text-transform: uppercase;
+  }
+
+  .nautilus-rack-lcd strong {
+    color: var(--ws-lcd-text);
+    font-size: 0.82rem;
+  }
+
+  .nautilus-rack-lcd em {
+    color: #93d9c8;
+    font-style: normal;
+  }
+
+  .nautilus-rack-knob-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.72rem 0.6rem;
+    min-width: 0;
+  }
+
+  .nautilus-rack-knob-grid .knob-control {
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    padding: 0;
+  }
+
+  .nautilus-rack-knob-grid .knob-label {
+    color: #8c6d95;
+  }
+
+  .nautilus-rack-knob-grid .knob-dial {
+    filter: drop-shadow(0 0 0.65rem rgba(81, 245, 198, 0.24));
+  }
+
+  .nautilus-rack-knob-grid .knob-value {
+    min-height: 1.3rem;
+    border: 1px solid rgba(104, 42, 105, 0.2);
+    border-radius: 3px;
+    background: rgba(65, 28, 66, 0.42);
+    color: #fff6ff;
+    display: grid;
+    place-items: center;
+  }
+
+  .nautilus-rack-status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ws-lcd-dim);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.62rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 1180px) {
+    .nautilus-inspired-top {
+      grid-template-columns: 1fr;
+    }
+
+    .nautilus-left-controls {
+      grid-template-columns: 3.2rem minmax(180px, 0.8fr) minmax(240px, 1.2fr);
+    }
+
+    .nautilus-right-controls {
+      grid-template-columns: minmax(150px, 0.55fr) minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .nautilus-left-controls {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "brand"
+        "knobs"
+        "util"
+        "fader";
+    }
+
+    .nautilus-master-fader {
+      grid-template-rows: auto auto auto;
+    }
+
+    .nautilus-master-fader input {
+      width: 100%;
+      min-height: auto;
+      writing-mode: horizontal-tb;
+    }
+
+    .nautilus-knob-bank,
+    .nautilus-utility-buttons,
+    .nautilus-setlist-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .nautilus-right-controls {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "encoder"
+        "quick"
+        "system"
+        "mode"
+        "meter";
+    }
+
+    .workstation-engine-mode-strip,
+    .nautilus-system-strip,
+    .nautilus-rack-knob-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .program-page .workstation-tab {
+      min-width: 6rem;
+    }
+  }
+
+  @media (max-width: 440px) {
+    .nautilus-knob-bank,
+    .nautilus-utility-buttons,
+    .nautilus-setlist-grid,
+    .nautilus-quick-access {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 }

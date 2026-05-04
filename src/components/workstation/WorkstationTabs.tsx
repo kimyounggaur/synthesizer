@@ -22,7 +22,7 @@ export function WorkstationTabs() {
             onClick={() => setActivePage(page.id)}
           >
             <span>{page.label}</span>
-            <strong>{page.detail}</strong>
+            {page.detail ? <strong>{page.detail}</strong> : <i className="workstation-button-led" aria-hidden="true" />}
           </button>
         );
       })}

@@ -120,7 +120,11 @@ export function ProgramPage() {
   return (
     <div className="workstation-page workstation-lcd-page program-page">
       <header className="workstation-page-header">
-        <MiniDisplay eyebrow="PROGRAM" value={activeProgram?.name.toUpperCase() ?? 'NO PROGRAM'} detail={activeProgram ? `${activeProgram.category} / ${activeProgram.author}` : bankTitle(selectedBank)} tone="cyan" />
+        <div className="touch-lcd-title">
+          <span>Touch LCD</span>
+          <h2>Program</h2>
+          <p>{activeProgram?.name ?? bankTitle(selectedBank)}</p>
+        </div>
         <WorkstationPageTabs labels={['BANK', 'CATEGORY', 'PROGRAM LIST']} ariaLabel="Program sections" variant="tabs" />
       </header>
 

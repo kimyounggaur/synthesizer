@@ -1,6 +1,7 @@
 import type { SampleBankManifest, SamplePresetDefinition } from '../types/soundfont';
+import { availableSampleBanks } from '../presets/samplePresets';
 
-const publicSampleBankIds = ['demo-lite'];
+const publicSampleBankIds = availableSampleBanks.map((bank) => bank.id);
 const manifestCache = new Map<string, SampleBankManifest>();
 let publicSampleBanksPromise: Promise<SampleBankManifest[]> | null = null;
 

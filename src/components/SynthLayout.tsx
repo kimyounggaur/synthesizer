@@ -8,7 +8,7 @@ import { OscillatorPanel } from './OscillatorPanel';
 import { FilterPanel } from './FilterPanel';
 import { EnvelopePanel } from './EnvelopePanel';
 import { PresetBrowser } from './PresetBrowser';
-import { SamplePresetBrowser } from './SamplePresetBrowser';
+import { SampleLayerPanel } from './SampleLayerPanel';
 import { LFOPanel } from './LFOPanel';
 import { VectorMixerPanel } from './VectorMixerPanel';
 import { WaveSequencerPanel } from './WaveSequencerPanel';
@@ -230,7 +230,7 @@ export function SynthLayout() {
       return <PresetBrowser meter={meter} />;
     }
     if (panelId === 'samples') {
-      return <SamplePresetBrowser />;
+      return <SampleLayerPanel />;
     }
     if (panelId === 'lfo') {
       return <LFOPanel />;

@@ -3067,6 +3067,98 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .sample-layer-panel .section-panel-body {
+    display: grid;
+  }
+
+  .sample-layer-grid {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .sample-layer-engine-block,
+  .sample-layer-bank-block,
+  .sample-layer-controls-block,
+  .sample-layer-filter-block {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .sample-layer-select-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .sample-layer-bank-meta {
+    display: grid;
+    gap: 0.28rem;
+    border: 1px solid rgba(94, 232, 255, 0.18);
+    border-radius: 6px;
+    background: rgba(6, 8, 12, 0.42);
+    padding: 0.55rem 0.65rem;
+  }
+
+  .sample-layer-bank-meta span,
+  .sample-layer-bank-meta strong {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  .sample-layer-bank-meta span {
+    color: #aeb9c0;
+    font-size: 0.78rem;
+  }
+
+  .sample-layer-bank-meta strong {
+    color: #e8fbff;
+    font-size: 0.76rem;
+  }
+
+  .sample-slider-row {
+    display: grid;
+    grid-template-columns: minmax(4.8rem, 0.55fr) minmax(0, 1fr) minmax(4.5rem, auto);
+    gap: 0.65rem;
+    align-items: center;
+    color: #edf7f7;
+  }
+
+  .sample-slider-row span,
+  .sample-slider-row strong {
+    font-size: 0.74rem;
+    font-weight: 900;
+    line-height: 1.1;
+  }
+
+  .sample-slider-row span {
+    color: #a9b7bc;
+    text-transform: uppercase;
+  }
+
+  .sample-slider-row strong {
+    color: #6ff0ff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .sample-preload-button {
+    width: 100%;
+    font-size: 0.78rem;
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .sample-preload-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.48;
+  }
+
+  .sample-layer-message {
+    margin-top: -0.15rem;
+  }
+
   @media (min-width: 1600px) {
     .main-console-grid {
       grid-template-columns: minmax(0, 1fr) minmax(520px, 620px);
@@ -3159,8 +3251,14 @@
     .effect-slot-header,
     .effect-knob-grid,
     .sample-knob-grid,
-    .sample-filter-knobs {
+    .sample-filter-knobs,
+    .sample-layer-select-grid,
+    .sample-slider-row {
       grid-template-columns: 1fr;
+    }
+
+    .sample-slider-row strong {
+      text-align: left;
     }
   }
 

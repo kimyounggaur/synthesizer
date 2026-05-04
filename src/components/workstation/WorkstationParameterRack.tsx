@@ -26,9 +26,9 @@ export function WorkstationParameterRack({ meter, onPanic, onTestTone }: Worksta
   const audioStatus = meter.audioState === 'suspended' ? 'AUDIO SUSPENDED' : meter.clipping ? 'CLIPPING' : 'READY';
 
   return (
-    <aside className="workstation-parameter-rack workstation-system-rack" aria-label="Workstation parameter rack">
+    <aside className="workstation-parameter-rack workstation-system-rack" aria-label="Quick control rack">
       <section className="module-block module-block-cyan workstation-card">
-        <MiniDisplay eyebrow="Page" value={page.label.toUpperCase()} detail={page.detail} tone="cyan" />
+        <MiniDisplay eyebrow="Touch Page" value={page.label.toUpperCase()} detail={page.detail} tone="cyan" />
         <div className="global-status-row">
           <span>Status</span>
           <strong>{audioStatus}</strong>
@@ -40,7 +40,7 @@ export function WorkstationParameterRack({ meter, onPanic, onTestTone }: Worksta
       </section>
 
       <section className="module-block module-block-mint workstation-card">
-        <MiniDisplay eyebrow="Engine" value={engineMode.toUpperCase()} detail={sampleLayer.enabled ? 'Sample layer on' : 'Sample layer off'} tone="mint" />
+        <MiniDisplay eyebrow="Quick Control" value={engineMode.toUpperCase()} detail={sampleLayer.enabled ? 'Sample layer on' : 'Sample layer off'} tone="mint" />
         <div className="global-status-row">
           <span>Master</span>
           <strong>{formatPercent(masterVolume)}</strong>
@@ -56,7 +56,7 @@ export function WorkstationParameterRack({ meter, onPanic, onTestTone }: Worksta
       </section>
 
       <section className="module-block module-block-amber workstation-card">
-        <MiniDisplay eyebrow="Utility" value="SYSTEM" detail="Transport safety" tone="amber" />
+        <MiniDisplay eyebrow="Utility" value="SAFE CTRL" detail="Test / panic" tone="amber" />
         <div className="workstation-rack-actions">
           <button type="button" className="soft-button global-hardware-button" onClick={onTestTone}>
             Test Tone

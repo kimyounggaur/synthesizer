@@ -7,7 +7,7 @@ export function SynthPage() {
       <header className="workstation-page-header">
         <div>
           <h2>SYNTH EDIT</h2>
-          <p>Oscillator editing is connected to the existing synth panel.</p>
+          <p>OSC / MIX / SOURCE</p>
         </div>
         <WorkstationPageTabs labels={['OSC BASIC', 'SUB/NOISE', 'MIX']} ariaLabel="Oscillator edit sections" />
       </header>

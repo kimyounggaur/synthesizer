@@ -7,7 +7,7 @@ export function ModulationPage() {
       <header className="workstation-page-header">
         <div>
           <h2>MODULATION</h2>
-          <p>LFO routing is connected to the existing modulation panel.</p>
+          <p>LFO / ROUTING / SYNC</p>
         </div>
         <WorkstationPageTabs labels={['LFO', 'ROUTING', 'SYNC']} ariaLabel="Modulation sections" />
       </header>

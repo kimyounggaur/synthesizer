@@ -13,7 +13,7 @@ export function GlobalPage({ onPanic }: GlobalPageProps) {
       <header className="workstation-page-header">
         <div>
           <h2>GLOBAL SETTINGS</h2>
-          <p>System controls will appear here as the workstation MVP expands.</p>
+          <p>AUDIO / KEYBOARD / SYSTEM</p>
         </div>
         <WorkstationPageTabs labels={['AUDIO', 'KEYBOARD', 'SYSTEM', 'ABOUT']} ariaLabel="Global settings sections" />
       </header>

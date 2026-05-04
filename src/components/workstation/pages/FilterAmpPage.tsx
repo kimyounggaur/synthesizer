@@ -8,7 +8,7 @@ export function FilterAmpPage() {
       <header className="workstation-page-header">
         <div>
           <h2>FILTER / AMP</h2>
-          <p>Filter and envelope editing use the existing panels.</p>
+          <p>VCF / AMP EG / FILTER EG</p>
         </div>
         <WorkstationPageTabs labels={['FILTER', 'AMP EG', 'FILTER EG']} ariaLabel="Filter and amp sections" />
       </header>

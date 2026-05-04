@@ -8,7 +8,7 @@ export function WaveVectorPage() {
       <header className="workstation-page-header">
         <div>
           <h2>WAVE / VECTOR</h2>
-          <p>Vector mixing and wave sequencing use the existing panels.</p>
+          <p>VECTOR / WAVE SEQ / STEP</p>
         </div>
         <WorkstationPageTabs labels={['VECTOR', 'WAVE SEQ', 'STEP DETAIL']} ariaLabel="Wave vector sections" />
       </header>

@@ -1005,7 +1005,7 @@
     overflow: hidden;
     color: #f4fdff;
     font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: clamp(0.92rem, 1vw, 1.18rem);
+    font-size: 1rem;
     font-weight: 900;
     line-height: 1.05;
     text-overflow: ellipsis;
@@ -3200,9 +3200,11 @@
   }
 
   .workstation-shell {
+    position: relative;
+    overflow: hidden;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 16%),
-      linear-gradient(135deg, #242a31, #0d1014 55%, #1a1d22);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.09), transparent 13%),
+      linear-gradient(115deg, #2d333a 0%, #11151a 42%, #06080b 72%, #1c2026 100%);
     border: 1px solid rgba(188, 197, 206, 0.24);
     box-shadow:
       0 30px 80px rgba(0, 0, 0, 0.55),
@@ -3210,18 +3212,95 @@
       inset 0 -1px 0 rgba(0, 0, 0, 0.85);
   }
 
+  .touch-workstation-shell::before,
+  .touch-workstation-shell::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 0.42rem;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16), transparent 18%, rgba(0, 0, 0, 0.34)),
+      #252b32;
+    opacity: 0.72;
+  }
+
+  .touch-workstation-shell::before {
+    left: 0;
+  }
+
+  .touch-workstation-shell::after {
+    right: 0;
+  }
+
   .workstation-topbar {
+    position: relative;
+    z-index: 1;
+    grid-template-columns: minmax(190px, 0.56fr) minmax(320px, 1.1fr) minmax(220px, 0.74fr) minmax(220px, 0.74fr) minmax(330px, 1.1fr);
     border-color: var(--ws-border);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.012)),
-      var(--ws-panel);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.018)),
+      linear-gradient(90deg, rgba(66, 198, 255, 0.06), transparent 38%, rgba(242, 184, 75, 0.04)),
+      #11161c;
   }
 
   .workstation-brand-plate {
-    border-color: rgba(81, 245, 198, 0.22);
+    border-color: rgba(188, 197, 206, 0.2);
     background:
-      linear-gradient(180deg, rgba(81, 245, 198, 0.06), rgba(0, 0, 0, 0.02)),
-      var(--ws-panel-2);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(0, 0, 0, 0.12)),
+      #181d23;
+  }
+
+  .workstation-brand-plate .brand-mark {
+    border-color: rgba(66, 198, 255, 0.36);
+    background:
+      linear-gradient(180deg, rgba(66, 198, 255, 0.18), rgba(7, 18, 15, 0.12)),
+      #06090d;
+    color: var(--ws-blue);
+  }
+
+  .workstation-touch-mode-strip {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0.32rem;
+    align-content: stretch;
+    min-width: 0;
+    border: 1px solid rgba(188, 197, 206, 0.16);
+    border-radius: 8px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.01)),
+      #0a0e12;
+    padding: 0.35rem;
+  }
+
+  .touch-mode-button {
+    min-width: 0;
+    min-height: 2.4rem;
+    border: 1px solid rgba(66, 198, 255, 0.16);
+    border-radius: 6px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(0, 0, 0, 0.16)),
+      #151b21;
+    color: #cfd9dd;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.66rem;
+    font-weight: 900;
+    padding: 0.35rem 0.28rem;
+    text-align: center;
+    text-transform: uppercase;
+  }
+
+  .touch-mode-button.is-active,
+  .touch-mode-button[aria-pressed="true"] {
+    border-color: rgba(66, 198, 255, 0.64);
+    background:
+      linear-gradient(180deg, rgba(66, 198, 255, 0.24), rgba(81, 245, 198, 0.08)),
+      #07120f;
+    color: #e9fffb;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 0 18px rgba(66, 198, 255, 0.16);
   }
 
   .workstation-program-lcd,
@@ -3229,26 +3308,31 @@
     position: relative;
     min-width: 0;
     overflow: hidden;
-    border: 1px solid rgba(81, 245, 198, 0.26);
+    border: 1px solid rgba(66, 198, 255, 0.28);
     border-radius: 8px;
     background:
-      linear-gradient(180deg, rgba(81, 245, 198, 0.08), rgba(66, 198, 255, 0.025)),
-      var(--ws-lcd-bg);
-    box-shadow: inset 0 0 28px rgba(81, 245, 198, 0.08);
+      linear-gradient(180deg, rgba(66, 198, 255, 0.09), rgba(81, 245, 198, 0.025)),
+      #050b0f;
+    box-shadow:
+      inset 0 0 28px rgba(66, 198, 255, 0.09),
+      0 0 0 1px rgba(0, 0, 0, 0.52);
   }
 
   .workstation-main-deck {
-    border: 1px solid rgba(188, 197, 206, 0.16);
+    position: relative;
+    z-index: 1;
+    border: 1px solid rgba(188, 197, 206, 0.18);
     border-radius: 8px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.006)),
-      rgba(8, 10, 13, 0.38);
-    padding: 0.35rem;
+      linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.007)),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.18), transparent 16%, transparent 84%, rgba(0, 0, 0, 0.22)),
+      rgba(8, 10, 13, 0.5);
+    padding: 0.55rem;
   }
 
   .workstation-workspace-grid {
     display: grid;
-    grid-template-columns: minmax(168px, 0.22fr) minmax(0, 1fr) minmax(230px, 0.28fr);
+    grid-template-columns: minmax(156px, 0.2fr) minmax(0, 1fr) minmax(230px, 0.26fr);
     gap: 0.75rem;
     align-items: start;
     min-width: 0;
@@ -3257,8 +3341,9 @@
   .workstation-page-container {
     overflow: visible;
     background:
-      linear-gradient(180deg, rgba(81, 245, 198, 0.06), rgba(66, 198, 255, 0.018)),
-      rgba(7, 18, 15, 0.5);
+      linear-gradient(180deg, rgba(66, 198, 255, 0.07), rgba(81, 245, 198, 0.018)),
+      #03070a;
+    padding: 0.46rem;
   }
 
   .workstation-page-container:focus-visible,
@@ -3284,21 +3369,38 @@
   }
 
   .workstation-side-button {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.5rem;
     min-height: 2.35rem;
-    border: 1px solid rgba(188, 197, 206, 0.16);
-    border-radius: 5px;
+    border: 1px solid rgba(188, 197, 206, 0.18);
+    border-radius: 6px;
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0)),
-      var(--ws-panel);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(0, 0, 0, 0.24)),
+      #171d23;
     color: #dce8e6;
     font-size: 0.78rem;
     font-weight: 900;
     padding: 0.35rem 0.55rem;
+    padding-left: 0.78rem;
     text-align: left;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.56);
+  }
+
+  .workstation-side-button::before {
+    content: "";
+    position: absolute;
+    left: 0.32rem;
+    top: 50%;
+    width: 0.22rem;
+    height: 1.3rem;
+    border-radius: 999px;
+    background: rgba(90, 143, 127, 0.36);
+    transform: translateY(-50%);
   }
 
   .workstation-side-button span {
@@ -3317,11 +3419,17 @@
   .workstation-side-button:hover,
   .workstation-side-button.is-active,
   .workstation-side-button[aria-selected="true"] {
-    border-color: rgba(81, 245, 198, 0.58);
+    border-color: rgba(66, 198, 255, 0.62);
     background:
-      linear-gradient(180deg, rgba(81, 245, 198, 0.14), rgba(81, 245, 198, 0.04)),
-      var(--ws-lcd-bg-2);
+      linear-gradient(180deg, rgba(66, 198, 255, 0.18), rgba(81, 245, 198, 0.045)),
+      #0b1618;
     color: #f0fffb;
+  }
+
+  .workstation-side-button.is-active::before,
+  .workstation-side-button[aria-selected="true"]::before {
+    background: var(--ws-amber);
+    box-shadow: 0 0 12px rgba(242, 184, 75, 0.58);
   }
 
   .workstation-lcd-bezel {
@@ -3588,11 +3696,11 @@
     display: grid;
     min-width: 0;
     gap: 0.85rem;
-    border: 1px solid rgba(81, 245, 198, 0.24);
+    border: 1px solid rgba(66, 198, 255, 0.24);
     border-radius: 8px;
     background:
-      linear-gradient(180deg, rgba(81, 245, 198, 0.07), rgba(66, 198, 255, 0.025)),
-      #080d10;
+      linear-gradient(180deg, rgba(66, 198, 255, 0.08), rgba(81, 245, 198, 0.02)),
+      #050b0f;
     padding: 0.85rem;
     box-shadow: inset 0 0 28px rgba(81, 245, 198, 0.06);
   }
@@ -3601,11 +3709,11 @@
     display: grid;
     min-width: 0;
     gap: 0.85rem;
-    border: 1px solid rgba(81, 245, 198, 0.24);
+    border: 1px solid rgba(66, 198, 255, 0.24);
     border-radius: 8px;
     background:
-      linear-gradient(180deg, rgba(81, 245, 198, 0.07), rgba(66, 198, 255, 0.025)),
-      #080d10;
+      linear-gradient(180deg, rgba(66, 198, 255, 0.08), rgba(81, 245, 198, 0.02)),
+      #050b0f;
     padding: 0.85rem;
     box-shadow: inset 0 0 28px rgba(81, 245, 198, 0.06);
   }
@@ -4717,6 +4825,7 @@
 
   @media (max-width: 760px) {
     .top-control-strip,
+    .workstation-touch-mode-strip,
     .sub-module-grid,
     .filter-display-block,
     .side-rack-grid {
@@ -4853,6 +4962,10 @@
       grid-template-columns: 1fr;
     }
 
+    .workstation-touch-mode-strip {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .workstation-tabs,
     .workstation-subtabs {
       flex-wrap: nowrap;
@@ -4944,6 +5057,10 @@
     }
 
     .workstation-soft-keys {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .workstation-touch-mode-strip {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }

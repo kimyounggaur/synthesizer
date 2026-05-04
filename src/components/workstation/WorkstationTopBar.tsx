@@ -5,10 +5,21 @@ import { sampleFactoryPresets } from '../../presets/sampleFactoryPresets';
 import { getCachedSamplePreset } from '../../samples/sampleBankLibrary';
 import { usePresetStore } from '../../store/presetStore';
 import { selectEngineState, useSynthStore } from '../../store/synthStore';
+import type { WorkstationPageId } from '../../store/uiStore';
+import { useUiStore } from '../../store/uiStore';
 import { Knob } from '../ui/Knob';
 import { LedButton } from '../ui/LedButton';
 import { OutputMeter } from '../OutputMeter';
 import { ProgramDisplay } from '../ProgramDisplay';
+
+const touchModes: Array<{ id: WorkstationPageId; label: string }> = [
+  { id: 'program', label: 'Set List' },
+  { id: 'sample', label: 'Sample' },
+  { id: 'synth', label: 'Edit' },
+  { id: 'filterAmp', label: 'Filter' },
+  { id: 'effects', label: 'FX' },
+  { id: 'global', label: 'Global' },
+];
 
 interface WorkstationTopBarProps {
   onPanic: () => void;
@@ -26,6 +37,8 @@ export function WorkstationTopBar({ onPanic, onTestTone, meter }: WorkstationTop
   const setMasterVolume = useSynthStore((state) => state.setMasterVolume);
   const setBpm = useSynthStore((state) => state.setBpm);
   const setPolyphony = useSynthStore((state) => state.setPolyphony);
+  const activePage = useUiStore((state) => state.activeWorkstationPage);
+  const setActivePage = useUiStore((state) => state.setActiveWorkstationPage);
   const selectedPreset = useMemo(
     () => [...factoryPresets, ...sampleFactoryPresets, ...userPresets].find((preset) => preset.id === currentPreset),
     [currentPreset, userPresets],
@@ -40,15 +53,26 @@ export function WorkstationTopBar({ onPanic, onTestTone, meter }: WorkstationTop
     <header className="command-panel workstation-topbar">
       <div className="brand-plate workstation-brand-plate">
         <div className="brand-mark" aria-hidden="true">
-          M
+          MW
         </div>
         <div>
-          <div className="brand-name">M-WAVE SMK-37</div>
-          <div className="brand-subtitle">Elite Hybrid Synthesizer</div>
+          <div className="brand-name">M-WAVE OCEAN-61</div>
+          <div className="brand-subtitle">Touch Workstation Synthesizer</div>
         </div>
       </div>
 
       <ProgramDisplay engine={engineState} preset={selectedPreset} samplePreset={selectedSamplePreset} status={status} />
+
+      <nav className="workstation-touch-mode-strip" aria-label="Touch mode shortcuts">
+        {touchModes.map((mode, index) => {
+          const active = mode.id === activePage;
+          return (
+            <button key={`${mode.id}-${mode.label}-${index}`} type="button" className={active ? 'touch-mode-button is-active' : 'touch-mode-button'} aria-pressed={active} onClick={() => setActivePage(mode.id)}>
+              {mode.label}
+            </button>
+          );
+        })}
+      </nav>
 
       <OutputMeter meter={meter} compact onTestTone={onTestTone} />
 

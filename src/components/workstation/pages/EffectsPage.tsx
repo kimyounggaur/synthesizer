@@ -7,7 +7,7 @@ export function EffectsPage() {
       <header className="workstation-page-header">
         <div>
           <h2>EFFECTS</h2>
-          <p>Insert effects are connected to the existing effects panel.</p>
+          <p>IFX / MFX / CHAIN</p>
         </div>
         <WorkstationPageTabs labels={['INSERT FX', 'MASTER FX', 'CHAIN']} ariaLabel="Effects sections" />
       </header>

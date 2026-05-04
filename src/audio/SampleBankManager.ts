@@ -1,4 +1,4 @@
-import type { SampleBankManifest, SamplePresetDefinition, SampleZone } from '../types/synth';
+import type { SampleBankManifest, SamplePresetDefinition, SampleZone } from '../types/soundfont';
 import { clamp, midiNoteToFrequency } from '../utils/audioMath';
 
 interface RegisteredSampleBank {

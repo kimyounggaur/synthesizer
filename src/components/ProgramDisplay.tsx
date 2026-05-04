@@ -1,4 +1,5 @@
-import type { SamplePresetDefinition, SynthEngineState, SynthPreset } from '../types/synth';
+import type { SamplePresetDefinition } from '../types/soundfont';
+import type { SynthEngineState, SynthPreset } from '../types/synth';
 import { PresetArtwork } from './PresetArtwork';
 
 interface ProgramDisplayProps {

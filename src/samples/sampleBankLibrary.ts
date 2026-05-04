@@ -1,5 +1,5 @@
 import { SampleBankManager } from '../audio/SampleBankManager';
-import type { SampleBankManifest } from '../types/synth';
+import type { SampleBankManifest } from '../types/soundfont';
 import demoSampleBankJson from './demoSampleBank.json';
 
 export const builtInSampleBanks: SampleBankManifest[] = [demoSampleBankJson as SampleBankManifest];

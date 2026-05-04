@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { loadPublicSampleBanks, sampleBankManager } from '../samples/sampleBankLibrary';
 import { useSynthStore } from '../store/synthStore';
-import type { EngineMode, SampleBankManifest, SampleCategory, SamplePresetDefinition } from '../types/synth';
+import type { EngineMode, SampleBankManifest, SampleCategory, SamplePresetDefinition } from '../types/soundfont';
 import { Knob } from './ui/Knob';
 
 type SampleFilter = SampleCategory | 'All';

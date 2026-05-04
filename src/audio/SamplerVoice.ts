@@ -1,5 +1,6 @@
 import { EnvelopeModule } from './EnvelopeModule';
-import type { SampleLayerState, SamplePresetDefinition, SampleZone, SynthEngineState } from '../types/synth';
+import type { SampleLayerState, SamplePresetDefinition, SampleZone } from '../types/soundfont';
+import type { SynthEngineState } from '../types/synth';
 import { clamp, normalizeVelocity, semitoneRatio } from '../utils/audioMath';
 
 type SamplerVoiceEndedCallback = (voice: SamplerVoice) => void;

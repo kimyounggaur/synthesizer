@@ -1,13 +1,12 @@
 import { create } from 'zustand';
+import type { EngineMode, SampleLayerState } from '../types/soundfont';
 import type {
-  EngineMode,
   EffectState,
   EnvelopeState,
   FilterState,
   LfoState,
   NoiseState,
   OscillatorState,
-  SampleLayerState,
   SubOscillatorState,
   SynthEngineState,
   SynthPreset,

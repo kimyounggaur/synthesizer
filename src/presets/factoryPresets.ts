@@ -1,4 +1,5 @@
 import { createDefaultEngineState } from '../store/synthStore';
+import type { SampleLayerState } from '../types/soundfont';
 import type {
   EffectState,
   EffectType,
@@ -7,7 +8,6 @@ import type {
   LfoState,
   NoiseState,
   OscillatorState,
-  SampleLayerState,
   SubOscillatorState,
   SynthEngineState,
   SynthPreset,

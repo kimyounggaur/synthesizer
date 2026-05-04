@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { loadPublicSampleBanks, sampleBankManager } from '../samples/sampleBankLibrary';
+import { getCachedSampleBank, getCachedSampleBankManifests, getCachedSamplePreset, loadPublicSampleBanks } from '../samples/sampleBankLibrary';
 import { useSynthStore } from '../store/synthStore';
 import type { EngineMode, SampleBankManifest, SampleCategory, SamplePresetDefinition } from '../types/soundfont';
 import { Knob } from './ui/Knob';
@@ -47,7 +47,7 @@ export function SamplePresetBrowser() {
   const [query, setQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<SampleFilter>('All');
   const [selectedBankId, setSelectedBankId] = useState<BankFilter>('All');
-  const [banks, setBanks] = useState<SampleBankManifest[]>(() => sampleBankManager.getBankManifests());
+  const [banks, setBanks] = useState<SampleBankManifest[]>(() => getCachedSampleBankManifests());
   const [sampleBankLoadError, setSampleBankLoadError] = useState<string | null>(null);
   const engineMode = useSynthStore((state) => state.engineMode);
   const sampleLayer = useSynthStore((state) => state.sampleLayer);
@@ -58,9 +58,9 @@ export function SamplePresetBrowser() {
   useEffect(() => {
     let mounted = true;
     loadPublicSampleBanks()
-      .then(() => {
+      .then((manifests) => {
         if (mounted) {
-          setBanks(sampleBankManager.getBankManifests());
+          setBanks(manifests);
           setSampleBankLoadError(null);
         }
       })
@@ -107,8 +107,8 @@ export function SamplePresetBrowser() {
     });
   }, [presets, query, selectedBankId, selectedFilter]);
 
-  const activePreset = sampleBankManager.getPreset(sampleLayer.bankId, sampleLayer.presetId);
-  const activeBank = sampleBankManager.getBank(sampleLayer.bankId);
+  const activePreset = getCachedSamplePreset(sampleLayer.bankId, sampleLayer.presetId);
+  const activeBank = getCachedSampleBank(sampleLayer.bankId);
 
   return (
     <section className="panel sample-preset-panel">

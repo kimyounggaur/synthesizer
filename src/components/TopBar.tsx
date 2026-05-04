@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import type { MeterSnapshot } from '../types/synth';
 import { factoryPresets } from '../presets/factoryPresets';
-import { sampleBankManager } from '../samples/sampleBankLibrary';
+import { getCachedSamplePreset } from '../samples/sampleBankLibrary';
 import { usePresetStore } from '../store/presetStore';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
 import { Knob } from './ui/Knob';
@@ -30,7 +30,7 @@ export function TopBar({ onPanic, onTestTone, meter }: TopBarProps) {
     [currentPreset, userPresets],
   );
   const selectedSamplePreset = useMemo(
-    () => sampleBankManager.getPreset(engineState.sampleLayer.bankId, engineState.sampleLayer.presetId) ?? undefined,
+    () => getCachedSamplePreset(engineState.sampleLayer.bankId, engineState.sampleLayer.presetId) ?? undefined,
     [engineState.sampleLayer.bankId, engineState.sampleLayer.presetId],
   );
 

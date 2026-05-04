@@ -1,24 +1,52 @@
-import { SampleBankManager } from '../audio/SampleBankManager';
-import type { SampleBankManifest } from '../types/soundfont';
-import demoSampleBankJson from './demoSampleBank.json';
+import type { SampleBankManifest, SamplePresetDefinition } from '../types/soundfont';
 
-export const builtInSampleBanks: SampleBankManifest[] = [demoSampleBankJson as SampleBankManifest];
+const publicSampleBankIds = ['demo-lite'];
+const manifestCache = new Map<string, SampleBankManifest>();
+let publicSampleBanksPromise: Promise<SampleBankManifest[]> | null = null;
 
-export const sampleBankManager = new SampleBankManager();
-const publicSampleBankManifestPaths = ['soundfonts/demo-lite/manifest.json'];
-let publicSampleBanksPromise: Promise<void> | null = null;
-
-for (const bank of builtInSampleBanks) {
-  sampleBankManager.registerManifest(bank);
+function manifestUrlForBank(bankId: string): string {
+  return `${import.meta.env.BASE_URL}soundfonts/${bankId}/manifest.json`;
 }
 
-function publicAssetUrl(path: string): string {
-  return `${import.meta.env.BASE_URL}${path.replace(/^\/+/, '')}`;
+async function loadSampleBankManifest(bankId: string): Promise<SampleBankManifest> {
+  const cached = manifestCache.get(bankId);
+  if (cached) {
+    return cached;
+  }
+
+  const response = await fetch(manifestUrlForBank(bankId));
+  if (!response.ok) {
+    throw new Error(`Sample bank manifest failed to load: ${bankId}`);
+  }
+
+  const manifest = (await response.json()) as SampleBankManifest;
+  manifestCache.set(bankId, manifest);
+  return manifest;
 }
 
-export function loadPublicSampleBanks(): Promise<void> {
+export function getCachedSampleBankManifests(): SampleBankManifest[] {
+  return Array.from(manifestCache.values());
+}
+
+export function getCachedSampleBank(bankId: string | null): SampleBankManifest | null {
+  if (!bankId) {
+    return null;
+  }
+
+  return manifestCache.get(bankId) ?? null;
+}
+
+export function getCachedSamplePreset(bankId: string | null, presetId: string | null): SamplePresetDefinition | null {
+  if (!bankId || !presetId) {
+    return null;
+  }
+
+  return manifestCache.get(bankId)?.presets.find((preset) => preset.id === presetId) ?? null;
+}
+
+export function loadPublicSampleBanks(): Promise<SampleBankManifest[]> {
   if (!publicSampleBanksPromise) {
-    publicSampleBanksPromise = Promise.all(publicSampleBankManifestPaths.map((path) => sampleBankManager.loadManifest(publicAssetUrl(path)))).then(() => undefined);
+    publicSampleBanksPromise = Promise.all(publicSampleBankIds.map((bankId) => loadSampleBankManifest(bankId)));
   }
 
   return publicSampleBanksPromise;

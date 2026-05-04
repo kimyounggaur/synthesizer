@@ -3,7 +3,7 @@ import type { MeterSnapshot, SynthEngineState } from '../types/synth';
 import { clamp } from '../utils/audioMath';
 import { EffectsChain } from './EffectsChain';
 import { SamplerVoice } from './SamplerVoice';
-import { sampleBankManager } from '../samples/sampleBankLibrary';
+import { SampleBankManager } from './SampleBankManager';
 
 type WindowWithWebkitAudio = Window & typeof globalThis & {
   webkitAudioContext?: typeof AudioContext;
@@ -22,6 +22,7 @@ export class AudioEngine {
   private maxPolyphony: number;
   private analyserBuffer: Float32Array<ArrayBuffer>;
   private effectsChain: EffectsChain | null = null;
+  private readonly sampleBankManager: SampleBankManager;
   private voiceSerial = 0;
   private preloadedSampleKey: string | null = null;
 
@@ -35,6 +36,7 @@ export class AudioEngine {
     this.masterGain = this.context.createGain();
     this.compressor = this.context.createDynamicsCompressor();
     this.analyser = this.context.createAnalyser();
+    this.sampleBankManager = new SampleBankManager(this.context);
     this.state = initialState;
     this.maxPolyphony = initialState.polyphony;
 
@@ -67,9 +69,9 @@ export class AudioEngine {
     this.effectsChain?.update(state.effects);
     this.voices.forEach((voiceStack) => voiceStack.forEach((voice) => voice.updateState(state)));
     const sampleKey = `${state.sampleLayer.bankId ?? ''}:${state.sampleLayer.presetId ?? ''}`;
-    if (state.sampleLayer.enabled && state.sampleLayer.preload && sampleKey !== this.preloadedSampleKey) {
+    if (state.sampleLayer.enabled && state.sampleLayer.preload && state.sampleLayer.bankId && state.sampleLayer.presetId && sampleKey !== this.preloadedSampleKey) {
       this.preloadedSampleKey = sampleKey;
-      void sampleBankManager.preloadPreset(this.context, state.sampleLayer.bankId, state.sampleLayer.presetId).catch((error) => {
+      void this.sampleBankManager.preloadPreset(state.sampleLayer.bankId, state.sampleLayer.presetId).catch((error) => {
         console.warn(error);
       });
     }
@@ -165,6 +167,7 @@ export class AudioEngine {
 
   close(): void {
     this.panic();
+    this.sampleBankManager.clearCache();
     void this.context.close();
   }
 
@@ -189,11 +192,14 @@ export class AudioEngine {
     }
 
     if ((mode === 'sample' || mode === 'hybrid') && this.state.sampleLayer.enabled) {
-      const preset = sampleBankManager.getPreset(this.state.sampleLayer.bankId, this.state.sampleLayer.presetId);
-      if (preset) {
-        const zone = sampleBankManager.selectZone(preset, note, velocity);
-        if (zone) {
-          const buffer = await sampleBankManager.getZoneBuffer(this.context, zone, sampleBankManager.getBaseUrl(this.state.sampleLayer.bankId));
+      const bankId = this.state.sampleLayer.bankId;
+      const presetId = this.state.sampleLayer.presetId;
+      if (bankId && presetId) {
+        await this.sampleBankManager.loadBank(bankId);
+        const preset = this.sampleBankManager.getPreset(bankId, presetId);
+        const zone = preset ? this.sampleBankManager.findZone(preset, note, velocity) : null;
+        if (preset && zone) {
+          const buffer = await this.sampleBankManager.getBufferForZone(bankId, zone);
           voiceStack.push(new SamplerVoice(this.context, note, velocity, this.state, { buffer, preset, zone }, (endedVoice) => this.removeVoice(endedVoice)));
         }
       }

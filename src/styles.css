@@ -3447,7 +3447,7 @@
     display: grid;
     grid-template-columns: minmax(156px, 0.2fr) minmax(0, 1fr) minmax(230px, 0.26fr);
     gap: 0.75rem;
-    align-items: start;
+    align-items: stretch;
     min-width: 0;
   }
 
@@ -4750,10 +4750,13 @@
     display: grid;
     grid-template-columns: minmax(190px, 0.3fr) minmax(0, 1fr) minmax(260px, 0.42fr);
     gap: 0.75rem;
+    align-items: stretch;
+    --program-panel-height: 34rem;
     min-width: 0;
   }
 
   .program-bank-buttons {
+    height: var(--program-panel-height);
     max-height: 34rem;
     overflow: auto;
   }
@@ -4768,11 +4771,13 @@
 
   .program-list-frame {
     display: grid;
-    min-height: 30rem;
+    height: var(--program-panel-height);
+    min-height: var(--program-panel-height);
   }
 
   .program-list-frame .workstation-lcd-bezel,
   .program-list-frame .workstation-lcd-screen {
+    height: 100%;
     min-height: 0;
   }
 
@@ -4881,6 +4886,7 @@
   }
 
   .program-page-rack {
+    height: var(--program-panel-height);
     max-height: 34rem;
     overflow: auto;
   }

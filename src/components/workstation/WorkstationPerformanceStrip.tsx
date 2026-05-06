@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { EngineMode } from '../../types/soundfont';
 import { useSynthStore } from '../../store/synthStore';
 
@@ -7,6 +8,7 @@ const engineModes: EngineMode[] = ['synth', 'sample', 'hybrid'];
 interface WorkstationPerformanceStripProps {
   onPanic: () => void;
   onTestTone: () => void;
+  midiPanel?: ReactNode;
 }
 
 function modeLabel(mode: EngineMode): string {
@@ -17,7 +19,7 @@ function formatPercent(value: number): string {
   return `${Math.round(value * 100)}%`;
 }
 
-export function WorkstationPerformanceStrip({ onPanic, onTestTone }: WorkstationPerformanceStripProps) {
+export function WorkstationPerformanceStrip({ onPanic, onTestTone, midiPanel }: WorkstationPerformanceStripProps) {
   const [holdEnabled, setHoldEnabled] = useState(false);
   const keyboardOctave = useSynthStore((state) => state.keyboardOctave);
   const defaultVelocity = useSynthStore((state) => state.defaultVelocity);
@@ -45,6 +47,8 @@ export function WorkstationPerformanceStrip({ onPanic, onTestTone }: Workstation
         <input className="range" type="range" min={0.05} max={1} step={0.01} value={defaultVelocity} onChange={(event) => setDefaultVelocity(Number(event.target.value))} />
         <span className="performance-lcd">{formatPercent(defaultVelocity)}</span>
       </label>
+
+      {midiPanel}
 
       <div className="performance-strip-section performance-toggle-section">
         <button type="button" className={holdEnabled ? 'performance-button is-active' : 'performance-button'} aria-pressed={holdEnabled} onClick={() => setHoldEnabled((current) => !current)}>

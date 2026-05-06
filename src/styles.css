@@ -4420,7 +4420,7 @@
 
   .workstation-performance-strip {
     display: grid;
-    grid-template-columns: auto minmax(180px, 0.8fr) auto auto auto;
+    grid-template-columns: auto minmax(180px, 0.65fr) minmax(260px, 1fr) auto auto auto;
     gap: 0.55rem;
     align-items: stretch;
     border: 1px solid rgba(81, 245, 198, 0.22);
@@ -4446,6 +4446,92 @@
   .performance-velocity-section {
     display: grid;
     grid-template-columns: auto minmax(96px, 1fr) auto;
+  }
+
+  .midi-performance-section {
+    display: grid;
+    grid-template-columns: auto minmax(6.5rem, 0.75fr) minmax(8rem, 1fr) auto;
+    gap: 0.42rem;
+  }
+
+  .midi-panel-led {
+    width: 0.62rem;
+  }
+
+  .midi-state-connected .midi-panel-led {
+    background: #51f5c6;
+    box-shadow: 0 0 14px rgba(81, 245, 198, 0.86);
+  }
+
+  .midi-state-requesting .midi-panel-led {
+    background: #f2b84b;
+    box-shadow: 0 0 14px rgba(242, 184, 75, 0.72);
+  }
+
+  .midi-state-error .midi-panel-led,
+  .midi-state-unsupported .midi-panel-led {
+    background: #ff7373;
+    box-shadow: 0 0 14px rgba(255, 115, 115, 0.72);
+  }
+
+  .midi-panel-status {
+    display: grid;
+    min-width: 0;
+    gap: 0.05rem;
+    color: #aeb9c0;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    text-transform: uppercase;
+  }
+
+  .midi-panel-status span,
+  .midi-panel-status strong,
+  .midi-panel-status em {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .midi-panel-status span {
+    color: var(--ws-lcd-text);
+    font-size: 0.58rem;
+    font-weight: 950;
+  }
+
+  .midi-panel-status strong {
+    color: #f4fbfd;
+    font-size: 0.68rem;
+    font-weight: 950;
+  }
+
+  .midi-panel-status em {
+    color: #93a6ac;
+    font-size: 0.58rem;
+    font-style: normal;
+    font-weight: 800;
+    text-transform: none;
+  }
+
+  .midi-device-select {
+    min-height: 2.2rem;
+    min-width: 0;
+    border-color: rgba(81, 245, 198, 0.22);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(0, 0, 0, 0.24)),
+      #141a20;
+    color: #ecf8f6;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.68rem;
+    font-weight: 900;
+  }
+
+  .midi-device-select:disabled {
+    color: #708086;
+    opacity: 0.78;
+  }
+
+  .midi-connect-button {
+    min-width: 5.1rem;
   }
 
   .performance-mode-section,
@@ -5031,6 +5117,7 @@
     .global-system-actions,
     .workstation-performance-strip,
     .performance-velocity-section,
+    .midi-performance-section,
     .program-page-layout,
     .program-row,
     .program-row-load,

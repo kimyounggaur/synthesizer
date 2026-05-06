@@ -6,6 +6,7 @@ import { selectEngineState, useSynthStore } from '../store/synthStore';
 import { useUiStore } from '../store/uiStore';
 import { Keyboard } from './Keyboard';
 import { DrumPadPanel } from './DrumPadPanel';
+import { MidiPanel } from './MidiPanel';
 import { WorkstationLcd } from './workstation/WorkstationLcd';
 import { WorkstationParameterRack } from './workstation/WorkstationParameterRack';
 import { WorkstationPerformanceStrip } from './workstation/WorkstationPerformanceStrip';
@@ -142,7 +143,7 @@ export function SynthLayout() {
       tabs={<WorkstationTabs />}
       lcd={<WorkstationLcd activePageId={activeWorkstationPage}>{renderPage()}</WorkstationLcd>}
       parameterRack={<WorkstationParameterRack meter={meter} onPanic={handlePanic} onTestTone={handleTestTone} />}
-      performanceStrip={<WorkstationPerformanceStrip onPanic={handlePanic} onTestTone={handleTestTone} />}
+      performanceStrip={<WorkstationPerformanceStrip onPanic={handlePanic} onTestTone={handleTestTone} midiPanel={<MidiPanel onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} onPanic={handlePanic} />} />}
       keybed={<Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />}
       engineError={engineError}
     />

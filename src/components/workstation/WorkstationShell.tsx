@@ -28,9 +28,9 @@ export function WorkstationShell({ topBar, tabs, lcd, parameterRack, performance
               {lcd}
               {parameterRack}
             </section>
+            <div className="workstation-keybed-frame">{keybed}</div>
             {performanceStrip}
             {drumPads}
-            <div className="workstation-keybed-frame">{keybed}</div>
           </>
         )}
       </div>

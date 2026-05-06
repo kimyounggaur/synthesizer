@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AudioEngine } from '../audio/AudioEngine';
+import type { DrumSoundId } from '../audio/drumKit';
 import type { MeterSnapshot } from '../types/synth';
 import { selectEngineState, useSynthStore } from '../store/synthStore';
 import { useUiStore } from '../store/uiStore';
 import { Keyboard } from './Keyboard';
+import { DrumPadPanel } from './DrumPadPanel';
 import { WorkstationLcd } from './workstation/WorkstationLcd';
 import { WorkstationParameterRack } from './workstation/WorkstationParameterRack';
 import { WorkstationPerformanceStrip } from './workstation/WorkstationPerformanceStrip';
@@ -105,6 +107,10 @@ export function SynthLayout() {
     }, 650);
   }, [clearActiveNote, setActiveNote]);
 
+  const handleDrumPadTrigger = useCallback((sound: DrumSoundId, velocity: number) => {
+    void engineRef.current?.playDrum(sound, velocity);
+  }, []);
+
   const renderPage = () => {
     if (activeWorkstationPage === 'program') {
       return <ProgramPage />;
@@ -137,6 +143,7 @@ export function SynthLayout() {
       lcd={<WorkstationLcd activePageId={activeWorkstationPage}>{renderPage()}</WorkstationLcd>}
       parameterRack={<WorkstationParameterRack meter={meter} onPanic={handlePanic} onTestTone={handleTestTone} />}
       performanceStrip={<WorkstationPerformanceStrip onPanic={handlePanic} onTestTone={handleTestTone} />}
+      drumPads={<DrumPadPanel onTrigger={handleDrumPadTrigger} />}
       keybed={<Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />}
       engineError={engineError}
     />

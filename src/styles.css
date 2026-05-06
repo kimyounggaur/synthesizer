@@ -435,7 +435,8 @@
 
   .movable-panel-oscillators,
   .movable-panel-presets,
-  .movable-panel-samples {
+  .movable-panel-samples,
+  .movable-panel-drums {
     grid-column: span 2;
   }
 
@@ -1129,6 +1130,118 @@
       inset 0 -12px 18px rgba(255, 120, 201, 0.34),
       0 0 18px rgba(94, 232, 255, 0.76),
       0 1px 0 rgba(0, 0, 0, 0.84) !important;
+  }
+
+  .drum-pad-panel .section-panel-body {
+    background:
+      radial-gradient(circle at 50% 18%, rgba(123, 209, 255, 0.14), transparent 42%),
+      linear-gradient(180deg, rgba(16, 18, 24, 0.96), rgba(4, 5, 8, 0.98));
+  }
+
+  .drum-pad-shell {
+    display: grid;
+    gap: 0.8rem;
+    border: 1px solid rgba(135, 145, 168, 0.28);
+    border-radius: 7px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(0, 0, 0, 0.34)),
+      #08090d;
+    padding: 0.85rem;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.72);
+  }
+
+  .drum-pad-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(4.2rem, 1fr));
+    gap: 0.72rem;
+  }
+
+  .drum-pad {
+    position: relative;
+    display: grid;
+    min-width: 0;
+    aspect-ratio: 1 / 0.88;
+    place-items: center;
+    overflow: hidden;
+    border: 3px solid var(--pad-accent);
+    border-radius: 6px;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.08), transparent 34%),
+      linear-gradient(180deg, #202129, #08090d 58%, #050508);
+    color: rgba(244, 247, 255, 0.92);
+    cursor: pointer;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    box-shadow:
+      inset 0 0 0 2px rgba(0, 0, 0, 0.72),
+      inset 0 12px 18px rgba(255, 255, 255, 0.035),
+      0 0 0 1px rgba(0, 0, 0, 0.92),
+      0 0 18px color-mix(in srgb, var(--pad-accent) 28%, transparent);
+    transition: transform 70ms ease, filter 90ms ease, box-shadow 90ms ease;
+  }
+
+  .drum-pad-blue {
+    --pad-accent: #72caff;
+  }
+
+  .drum-pad-pink {
+    --pad-accent: #ff809d;
+  }
+
+  .drum-pad-violet {
+    --pad-accent: #c5a9ff;
+  }
+
+  .drum-pad-cream {
+    --pad-accent: #ffe3ae;
+  }
+
+  .drum-pad-number {
+    position: absolute;
+    top: 0.24rem;
+    right: 0.3rem;
+    color: var(--pad-accent);
+    font-size: clamp(0.58rem, 0.8vw, 0.78rem);
+    font-weight: 950;
+    line-height: 1;
+    text-shadow: 0 0 10px color-mix(in srgb, var(--pad-accent) 70%, transparent);
+  }
+
+  .drum-pad-name {
+    max-width: calc(100% - 0.5rem);
+    overflow: hidden;
+    font-size: clamp(0.64rem, 0.76vw, 0.84rem);
+    font-weight: 900;
+    letter-spacing: 0;
+    line-height: 1;
+    text-overflow: ellipsis;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .drum-pad-key {
+    position: absolute;
+    bottom: 0.28rem;
+    left: 0.32rem;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.46);
+    color: rgba(255, 255, 255, 0.78);
+    font-size: clamp(0.5rem, 0.68vw, 0.66rem);
+    font-weight: 900;
+    line-height: 1;
+    padding: 0.14rem 0.22rem;
+  }
+
+  .drum-pad:active,
+  .drum-pad.is-active {
+    transform: translateY(0.22rem) scale(0.965);
+    filter: brightness(1.34) saturate(1.24);
+    box-shadow:
+      inset 0 0 0 2px rgba(0, 0, 0, 0.72),
+      inset 0 0 22px color-mix(in srgb, var(--pad-accent) 44%, transparent),
+      0 0 24px color-mix(in srgb, var(--pad-accent) 70%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--pad-accent) 70%, transparent);
   }
 
   .preset-list {

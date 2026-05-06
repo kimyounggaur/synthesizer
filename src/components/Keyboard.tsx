@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
+import { drumPadMap } from '../audio/drumKit';
 import { useSynthStore } from '../store/synthStore';
 
 interface KeyboardProps {
@@ -83,7 +84,8 @@ const computerKeyboardRows = [
   ],
 ] as const;
 
-const computerKeys = computerKeyboardRows.flat().slice(0, visibleKeyCount);
+const reservedDrumKeyCodes = new Set(drumPadMap.map((pad) => pad.keyCode));
+const computerKeys = computerKeyboardRows.flat().filter(([code]) => !reservedDrumKeyCodes.has(code)).slice(0, visibleKeyCount);
 const computerMap = new Map<string, number>(computerKeys.map(([code], offset) => [code, offset]));
 const computerKeyLabels = new Map<number, string>(computerKeys.map(([, label], offset) => [offset, label]));
 
@@ -119,6 +121,10 @@ export function Keyboard({ onNoteOn, onNoteOff }: KeyboardProps) {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.defaultPrevented) {
+        return;
+      }
+
       if (isEditableTarget(event.target)) {
         return;
       }

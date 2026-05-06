@@ -4,6 +4,7 @@ import { clamp } from '../utils/audioMath';
 import { EffectsChain } from './EffectsChain';
 import { SamplerVoice } from './SamplerVoice';
 import { SampleBankManager } from './SampleBankManager';
+import type { DrumSoundId } from './drumKit';
 
 type WindowWithWebkitAudio = Window & typeof globalThis & {
   webkitAudioContext?: typeof AudioContext;
@@ -21,6 +22,7 @@ export class AudioEngine {
   private readonly compressor: DynamicsCompressorNode;
   private readonly analyser: AnalyserNode;
   private readonly voices = new Map<number, ActiveVoice>();
+  private readonly drumSources = new Set<AudioScheduledSourceNode>();
   private state: SynthEngineState;
   private maxPolyphony: number;
   private analyserBuffer: Float32Array<ArrayBuffer>;
@@ -115,6 +117,97 @@ export class AudioEngine {
     voice.noteOff();
   }
 
+  async playDrum(sound: DrumSoundId, velocity = 1): Promise<void> {
+    await this.resume();
+    const level = clamp(velocity, 0.05, 1);
+
+    if (sound === 'kick') {
+      this.playTone({ type: 'sine', startFreq: 136, endFreq: 42, duration: 0.52, gain: 1.22, velocity: level });
+      this.playNoise({ duration: 0.035, gain: 0.22, velocity: level, filterType: 'highpass', frequency: 4200, q: 0.7 });
+      return;
+    }
+
+    if (sound === 'snare') {
+      this.playTone({ type: 'triangle', startFreq: 205, endFreq: 145, duration: 0.22, gain: 0.34, velocity: level });
+      this.playNoise({ duration: 0.32, gain: 0.88, velocity: level, filterType: 'bandpass', frequency: 1900, q: 1.1 });
+      return;
+    }
+
+    if (sound === 'closedHat') {
+      this.playNoise({ duration: 0.085, gain: 0.48, velocity: level, filterType: 'highpass', frequency: 7600, q: 0.92 });
+      return;
+    }
+
+    if (sound === 'openHat') {
+      this.playNoise({ duration: 0.58, gain: 0.42, velocity: level, filterType: 'highpass', frequency: 6700, q: 0.84, attack: 0.002 });
+      return;
+    }
+
+    if (sound === 'clap') {
+      [0, 0.018, 0.038].forEach((delay) => {
+        this.playNoise({ duration: 0.16, gain: 0.36, velocity: level, filterType: 'bandpass', frequency: 1500, q: 0.8, delay });
+      });
+      return;
+    }
+
+    if (sound === 'lowTom') {
+      this.playTone({ type: 'sine', startFreq: 132, endFreq: 78, duration: 0.44, gain: 0.82, velocity: level });
+      return;
+    }
+
+    if (sound === 'midTom') {
+      this.playTone({ type: 'sine', startFreq: 192, endFreq: 112, duration: 0.36, gain: 0.72, velocity: level });
+      return;
+    }
+
+    if (sound === 'highTom') {
+      this.playTone({ type: 'sine', startFreq: 286, endFreq: 172, duration: 0.3, gain: 0.62, velocity: level });
+      return;
+    }
+
+    if (sound === 'rim') {
+      this.playTone({ type: 'square', startFreq: 820, endFreq: 780, duration: 0.08, gain: 0.36, velocity: level });
+      this.playNoise({ duration: 0.05, gain: 0.18, velocity: level, filterType: 'highpass', frequency: 5200, q: 1.4 });
+      return;
+    }
+
+    if (sound === 'cowbell') {
+      this.playTone({ type: 'square', startFreq: 560, endFreq: 560, duration: 0.19, gain: 0.24, velocity: level });
+      this.playTone({ type: 'square', startFreq: 835, endFreq: 835, duration: 0.19, gain: 0.18, velocity: level });
+      return;
+    }
+
+    if (sound === 'crash') {
+      this.playNoise({ duration: 1.35, gain: 0.52, velocity: level, filterType: 'highpass', frequency: 4800, q: 0.42, attack: 0.003 });
+      return;
+    }
+
+    if (sound === 'ride') {
+      this.playNoise({ duration: 0.82, gain: 0.34, velocity: level, filterType: 'bandpass', frequency: 6200, q: 1.8, attack: 0.002 });
+      this.playTone({ type: 'triangle', startFreq: 1180, endFreq: 1160, duration: 0.28, gain: 0.11, velocity: level });
+      return;
+    }
+
+    if (sound === 'shaker') {
+      this.playNoise({ duration: 0.13, gain: 0.32, velocity: level, filterType: 'highpass', frequency: 9200, q: 1.1 });
+      return;
+    }
+
+    if (sound === 'tambourine') {
+      [0, 0.026].forEach((delay) => {
+        this.playNoise({ duration: 0.18, gain: 0.28, velocity: level, filterType: 'highpass', frequency: 7800, q: 0.8, delay });
+      });
+      return;
+    }
+
+    if (sound === 'click') {
+      this.playTone({ type: 'square', startFreq: 2600, endFreq: 2300, duration: 0.045, gain: 0.26, velocity: level });
+      return;
+    }
+
+    this.playTone({ type: 'sine', startFreq: 92, endFreq: 28, duration: 0.85, gain: 0.86, velocity: level });
+  }
+
   setMasterVolume(value: number): void {
     this.masterGain.gain.setTargetAtTime(clamp(value, 0, 1), this.context.currentTime, 0.02);
   }
@@ -122,6 +215,14 @@ export class AudioEngine {
   panic(): void {
     this.voices.forEach((voice) => voice.stopImmediately());
     this.voices.clear();
+    this.drumSources.forEach((source) => {
+      try {
+        source.stop();
+      } catch {
+        // Source may already be stopping; the onended cleanup will finish it.
+      }
+    });
+    this.drumSources.clear();
   }
 
   connectEffectsChain(chain: EffectsChain | null): void {
@@ -243,5 +344,91 @@ export class AudioEngine {
 
   private voiceCount(): number {
     return this.voices.size;
+  }
+
+  private playTone(options: {
+    type: OscillatorType;
+    startFreq: number;
+    endFreq: number;
+    duration: number;
+    gain: number;
+    velocity: number;
+    delay?: number;
+  }): void {
+    const now = this.context.currentTime + (options.delay ?? 0);
+    const oscillator = this.context.createOscillator();
+    const envelope = this.context.createGain();
+    const stopAt = now + options.duration + 0.05;
+
+    oscillator.type = options.type;
+    oscillator.frequency.setValueAtTime(Math.max(1, options.startFreq), now);
+    oscillator.frequency.exponentialRampToValueAtTime(Math.max(1, options.endFreq), now + options.duration);
+
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.linearRampToValueAtTime(options.gain * options.velocity, now + 0.004);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, now + options.duration);
+
+    oscillator.connect(envelope);
+    envelope.connect(this.masterGain);
+    oscillator.start(now);
+    oscillator.stop(stopAt);
+    this.drumSources.add(oscillator);
+    oscillator.onended = () => {
+      this.drumSources.delete(oscillator);
+      oscillator.disconnect();
+      envelope.disconnect();
+    };
+  }
+
+  private playNoise(options: {
+    duration: number;
+    gain: number;
+    velocity: number;
+    filterType: BiquadFilterType;
+    frequency: number;
+    q: number;
+    attack?: number;
+    delay?: number;
+  }): void {
+    const now = this.context.currentTime + (options.delay ?? 0);
+    const source = this.context.createBufferSource();
+    const filter = this.context.createBiquadFilter();
+    const envelope = this.context.createGain();
+    const attack = options.attack ?? 0.001;
+    const stopAt = now + options.duration + 0.04;
+
+    source.buffer = this.createNoiseBuffer(options.duration + 0.04);
+    filter.type = options.filterType;
+    filter.frequency.setValueAtTime(options.frequency, now);
+    filter.Q.setValueAtTime(options.q, now);
+
+    envelope.gain.setValueAtTime(0.0001, now);
+    envelope.gain.linearRampToValueAtTime(options.gain * options.velocity, now + attack);
+    envelope.gain.exponentialRampToValueAtTime(0.0001, now + options.duration);
+
+    source.connect(filter);
+    filter.connect(envelope);
+    envelope.connect(this.masterGain);
+    source.start(now);
+    source.stop(stopAt);
+    this.drumSources.add(source);
+    source.onended = () => {
+      this.drumSources.delete(source);
+      source.disconnect();
+      filter.disconnect();
+      envelope.disconnect();
+    };
+  }
+
+  private createNoiseBuffer(seconds: number): AudioBuffer {
+    const sampleCount = Math.max(1, Math.floor(this.context.sampleRate * seconds));
+    const buffer = this.context.createBuffer(1, sampleCount, this.context.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    for (let index = 0; index < sampleCount; index += 1) {
+      data[index] = Math.random() * 2 - 1;
+    }
+
+    return buffer;
   }
 }

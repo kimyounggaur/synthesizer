@@ -5180,10 +5180,10 @@
 
   .nautilus-inspired-top {
     display: grid;
-    grid-template-columns: minmax(360px, 0.92fr) minmax(560px, 1.18fr) minmax(360px, 0.92fr);
+    grid-template-columns: minmax(430px, 1fr) minmax(520px, 1.08fr) minmax(440px, 1fr);
     gap: 0.7rem;
     align-items: stretch;
-    min-height: 13.8rem;
+    min-height: 16.2rem;
     padding: 0.7rem;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.085), rgba(255, 255, 255, 0.018)),
@@ -5206,10 +5206,10 @@
 
   .nautilus-left-controls {
     display: grid;
-    grid-template-columns: 3.4rem minmax(180px, 0.82fr) minmax(260px, 1.18fr);
+    grid-template-columns: 3.4rem minmax(205px, 0.92fr) minmax(210px, 1fr);
     grid-template-areas:
-      "fader brand knobs"
-      "fader util util";
+      "fader drums knobs"
+      "fader drums util";
     gap: 0.72rem;
     padding: 0.72rem;
   }
@@ -5287,6 +5287,88 @@
     color: var(--ws-lcd-text);
     font-size: 0.72rem;
     font-weight: 800;
+  }
+
+  .nautilus-brand-readout-right {
+    grid-area: brand;
+    align-self: stretch;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+  }
+
+  .nautilus-brand-readout-right .brand-name,
+  .nautilus-brand-readout-right .brand-subtitle {
+    font-size: clamp(0.78rem, 0.82vw, 1rem);
+  }
+
+  .nautilus-brand-readout-right small {
+    font-size: clamp(0.58rem, 0.62vw, 0.72rem);
+  }
+
+  .nautilus-drum-pad-dock {
+    grid-area: drums;
+    display: grid;
+    min-width: 0;
+  }
+
+  .nautilus-drum-pad-dock .section-panel {
+    min-height: 0;
+  }
+
+  .nautilus-drum-pad-dock .section-panel-header {
+    min-height: 1.78rem;
+    padding: 0.34rem 0.42rem;
+  }
+
+  .nautilus-drum-pad-dock .section-panel-eyebrow {
+    font-size: 0.42rem;
+  }
+
+  .nautilus-drum-pad-dock .section-panel-title {
+    font-size: 0.64rem;
+  }
+
+  .nautilus-drum-pad-dock .section-panel-body {
+    padding: 0.42rem;
+  }
+
+  .nautilus-drum-pad-dock .drum-pad-shell {
+    height: 100%;
+    gap: 0.42rem;
+    padding: 0.46rem;
+  }
+
+  .nautilus-drum-pad-dock .mini-display {
+    display: none;
+  }
+
+  .nautilus-drum-pad-dock .drum-pad-grid {
+    grid-template-columns: repeat(4, minmax(2.05rem, 1fr));
+    gap: 0.36rem;
+  }
+
+  .nautilus-drum-pad-dock .drum-pad {
+    border-width: 2px;
+    border-radius: 5px;
+    aspect-ratio: 1;
+  }
+
+  .nautilus-drum-pad-dock .drum-pad-number {
+    top: 0.14rem;
+    right: 0.16rem;
+    font-size: clamp(0.44rem, 0.55vw, 0.58rem);
+  }
+
+  .nautilus-drum-pad-dock .drum-pad-name {
+    font-size: clamp(0.42rem, 0.52vw, 0.6rem);
+  }
+
+  .nautilus-drum-pad-dock .drum-pad-key {
+    bottom: 0.14rem;
+    left: 0.16rem;
+    font-size: clamp(0.38rem, 0.48vw, 0.52rem);
+    padding: 0.1rem 0.16rem;
   }
 
   .nautilus-knob-bank {
@@ -5584,11 +5666,11 @@
 
   .nautilus-right-controls {
     display: grid;
-    grid-template-columns: minmax(132px, 0.72fr) minmax(170px, 1fr);
+    grid-template-columns: minmax(108px, 0.62fr) minmax(132px, 0.78fr) minmax(150px, 0.84fr);
     grid-template-areas:
-      "encoder quick"
-      "system quick"
-      "mode meter";
+      "encoder quick brand"
+      "system quick brand"
+      "mode meter brand";
     gap: 0.58rem;
     padding: 0.72rem;
   }
@@ -5933,32 +6015,31 @@
     }
 
     .nautilus-left-controls {
-      grid-template-columns: 3.2rem minmax(180px, 0.8fr) minmax(240px, 1.2fr);
+      grid-template-columns: 3.2rem minmax(205px, 0.92fr) minmax(220px, 1fr);
     }
 
     .nautilus-right-controls {
-      grid-template-columns: minmax(150px, 0.55fr) minmax(0, 1fr);
+      grid-template-columns: minmax(130px, 0.55fr) minmax(0, 0.85fr) minmax(160px, 0.65fr);
     }
   }
 
   @media (max-width: 760px) {
     .nautilus-left-controls {
-      grid-template-columns: 1fr;
+      grid-template-columns: 3.2rem minmax(0, 1fr);
       grid-template-areas:
-        "brand"
-        "knobs"
-        "util"
-        "fader";
+        "fader drums"
+        "knobs knobs"
+        "util util";
     }
 
     .nautilus-master-fader {
-      grid-template-rows: auto auto auto;
+      grid-template-rows: auto minmax(8rem, 1fr) auto;
     }
 
     .nautilus-master-fader input {
-      width: 100%;
-      min-height: auto;
-      writing-mode: horizontal-tb;
+      width: 2rem;
+      min-height: 8rem;
+      writing-mode: vertical-lr;
     }
 
     .nautilus-knob-bank,
@@ -5974,7 +6055,8 @@
         "quick"
         "system"
         "mode"
-        "meter";
+        "meter"
+        "brand";
     }
 
     .workstation-engine-mode-strip,
@@ -5989,6 +6071,25 @@
   }
 
   @media (max-width: 440px) {
+    .nautilus-left-controls {
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "drums"
+        "knobs"
+        "util"
+        "fader";
+    }
+
+    .nautilus-master-fader {
+      grid-template-rows: auto auto auto;
+    }
+
+    .nautilus-master-fader input {
+      width: 100%;
+      min-height: auto;
+      writing-mode: horizontal-tb;
+    }
+
     .nautilus-knob-bank,
     .nautilus-utility-buttons,
     .nautilus-setlist-grid,

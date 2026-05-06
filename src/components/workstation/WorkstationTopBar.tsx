@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, type ReactNode } from 'react';
 import type { MeterSnapshot } from '../../types/synth';
 import { factoryPresets } from '../../presets/factoryPresets';
 import { sampleFactoryPresets } from '../../presets/sampleFactoryPresets';
@@ -25,9 +25,10 @@ interface WorkstationTopBarProps {
   onPanic: () => void;
   onTestTone: () => void;
   meter: MeterSnapshot;
+  drumPads?: ReactNode;
 }
 
-export function WorkstationTopBar({ onPanic, onTestTone, meter }: WorkstationTopBarProps) {
+export function WorkstationTopBar({ onPanic, onTestTone, meter, drumPads }: WorkstationTopBarProps) {
   const masterVolume = useSynthStore((state) => state.masterVolume);
   const bpm = useSynthStore((state) => state.bpm);
   const polyphony = useSynthStore((state) => state.polyphony);
@@ -65,16 +66,7 @@ export function WorkstationTopBar({ onPanic, onTestTone, meter }: WorkstationTop
           <strong>{Math.round(masterVolume * 100)}%</strong>
         </label>
 
-        <div className="nautilus-brand-readout">
-          <div className="brand-mark" aria-hidden="true">
-            VV
-          </div>
-          <div>
-            <div className="brand-name">VECTOR SAMPLE</div>
-            <div className="brand-subtitle">WORKSTATION</div>
-            <small>Hybrid Synth / Sample / FX</small>
-          </div>
-        </div>
+        {drumPads ? <div className="nautilus-drum-pad-dock">{drumPads}</div> : null}
 
         <div className="nautilus-knob-bank" aria-label="Realtime control knobs">
           {hardwareKnobs.map((knob) => (
@@ -176,6 +168,17 @@ export function WorkstationTopBar({ onPanic, onTestTone, meter }: WorkstationTop
 
         <div className="nautilus-meter-wrap">
           <OutputMeter meter={meter} compact onTestTone={onTestTone} />
+        </div>
+
+        <div className="nautilus-brand-readout nautilus-brand-readout-right">
+          <div className="brand-mark" aria-hidden="true">
+            VV
+          </div>
+          <div>
+            <div className="brand-name">VECTOR SAMPLE</div>
+            <div className="brand-subtitle">WORKSTATION</div>
+            <small>Hybrid Synth / Sample / FX</small>
+          </div>
         </div>
       </section>
     </header>

@@ -138,12 +138,11 @@ export function SynthLayout() {
 
   return (
     <WorkstationShell
-      topBar={<WorkstationTopBar onPanic={handlePanic} onTestTone={handleTestTone} meter={meter} />}
+      topBar={<WorkstationTopBar onPanic={handlePanic} onTestTone={handleTestTone} meter={meter} drumPads={<DrumPadPanel onTrigger={handleDrumPadTrigger} />} />}
       tabs={<WorkstationTabs />}
       lcd={<WorkstationLcd activePageId={activeWorkstationPage}>{renderPage()}</WorkstationLcd>}
       parameterRack={<WorkstationParameterRack meter={meter} onPanic={handlePanic} onTestTone={handleTestTone} />}
       performanceStrip={<WorkstationPerformanceStrip onPanic={handlePanic} onTestTone={handleTestTone} />}
-      drumPads={<DrumPadPanel onTrigger={handleDrumPadTrigger} />}
       keybed={<Keyboard onNoteOn={handleNoteOn} onNoteOff={handleNoteOff} />}
       engineError={engineError}
     />

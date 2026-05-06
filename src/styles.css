@@ -3432,6 +3432,7 @@
   }
 
   .workstation-main-deck {
+    --workstation-deck-panel-height: 34rem;
     position: relative;
     z-index: 1;
     border: 1px solid rgba(188, 197, 206, 0.18);
@@ -3454,9 +3455,10 @@
   .workstation-page-container {
     display: grid;
     align-self: stretch;
-    height: 100%;
-    min-height: 34rem;
-    overflow: visible;
+    height: var(--workstation-deck-panel-height);
+    min-height: var(--workstation-deck-panel-height);
+    max-height: var(--workstation-deck-panel-height);
+    overflow: hidden;
     background:
       linear-gradient(180deg, rgba(66, 198, 255, 0.07), rgba(81, 245, 198, 0.018)),
       #03070a;
@@ -3481,8 +3483,11 @@
   }
 
   .workstation-page-tabs {
-    position: sticky;
-    top: 0.5rem;
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    max-height: var(--workstation-deck-panel-height);
+    overflow: auto;
   }
 
   .workstation-side-button {
@@ -3773,13 +3778,18 @@
   .workstation-parameter-rack {
     display: grid;
     align-content: start;
+    align-self: stretch;
     gap: 0.65rem;
+    height: var(--workstation-deck-panel-height);
+    min-height: var(--workstation-deck-panel-height);
+    max-height: var(--workstation-deck-panel-height);
     min-width: 0;
+    overflow: auto;
   }
 
   .workstation-system-rack {
-    position: sticky;
-    top: 0.5rem;
+    position: relative;
+    top: auto;
   }
 
   .workstation-rack-actions {
@@ -3813,9 +3823,11 @@
     display: grid;
     grid-template-rows: auto auto minmax(0, 1fr) auto auto;
     height: 100%;
+    max-height: 100%;
     min-height: 0;
     min-width: 0;
     gap: 0.85rem;
+    overflow: hidden;
     border: 1px solid rgba(66, 198, 255, 0.24);
     border-radius: 8px;
     background:
@@ -4759,14 +4771,17 @@
     gap: 0.75rem;
     align-items: stretch;
     height: 100%;
-    --program-panel-height: 34rem;
+    max-height: 100%;
+    --program-panel-height: 100%;
     min-height: 0;
     min-width: 0;
+    overflow: hidden;
   }
 
   .program-bank-buttons {
     height: var(--program-panel-height);
-    max-height: 34rem;
+    min-height: 0;
+    max-height: 100%;
     overflow: auto;
   }
 
@@ -4781,8 +4796,9 @@
   .program-list-frame {
     display: grid;
     height: var(--program-panel-height);
-    min-height: var(--program-panel-height);
-    max-height: var(--program-panel-height);
+    min-height: 0;
+    max-height: 100%;
+    overflow: hidden;
   }
 
   .program-list-frame .workstation-lcd-bezel,
@@ -4795,6 +4811,7 @@
     display: grid;
     grid-template-rows: auto minmax(0, 1fr);
     gap: 0.65rem;
+    min-height: 0;
   }
 
   .program-list-heading,
@@ -4897,7 +4914,8 @@
 
   .program-page-rack {
     height: var(--program-panel-height);
-    max-height: 34rem;
+    min-height: 0;
+    max-height: 100%;
     overflow: auto;
   }
 
@@ -4993,6 +5011,7 @@
     .sample-page-sidebar {
       position: static;
       height: auto;
+      min-height: 0;
       max-height: none;
     }
 
